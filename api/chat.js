@@ -1,6 +1,32 @@
 // Servidor de Lenz: guarda la clave en secreto, aplica límites y transmite la respuesta en vivo.
 const CURSO = require('./_curso.js');
 
+// El material se divide por tema y solo se envía el que hace falta (así un saludo casi no cuesta nada).
+const SECC = CURSO.split(/\n\n(?=## )/).map(s => ({ nombre: s.split('\n')[0].replace('## ', '').trim(), texto: s.slice(0, 14000) }));
+const KW = [
+  'carga,coulomb,electron,proton,campo electrico,fuerza electrica,superposicion,aislante',
+  'potencial,energia potencial,equipotencial,voltaje,diferencia de potencial',
+  'condensador,capacitor,capacitancia,capacidad,dielectrico,placas,faradio',
+  'corriente,resistencia,ohm,resistividad,conductividad,amperio',
+  'serie,paralelo,potencia,multimetro,voltimetro,amperimetro,resistencia equivalente,joule',
+  'kirchhoff,nudo,malla,nodo,lazo,fem,circuito,bateria',
+  'rc,constante de tiempo,transitorio,tau,carga y descarga',
+  'magnetico,magnetismo,iman,lorentz,tesla,brujula,fuerza magnetica',
+  'biot,savart,ampere,oersted,solenoide,toroide,mano derecha',
+  'faraday,lenz,flujo,induccion,fem inducida,transformador,generador',
+  'alterna,rms,eficaz,fasor,frecuencia,reactancia,impedancia,senoidal',
+  'rlc,resonancia,factor de potencia,potencia aparente,potencia reactiva,bobina,inductor',
+  'diodo,rectificador,media onda,onda completa,filtro,puente,semiconductor',
+  'zener,regulacion,union pn,polarizacion'
+].map(s => s.split(','));
+const norm = s => String(s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+function pick(texto, tema) {
+  if (tema) { const s = SECC.find(x => x.nombre === tema); if (s) return [s]; }
+  const n = norm(texto);
+  return SECC.map((s, i) => ({ s, p: (KW[i] || []).reduce((a, k) => a + ((k.length <= 3 ? new RegExp('\\b' + k + '\\b').test(n) : n.includes(k)) ? (k.length > 5 ? 2 : 1) : 0), 0) }))
+    .filter(o => o.p > 0).sort((a, b) => b.p - a.p).slice(0, 2).map(o => o.s);
+}
+
 const SYS = `Eres Lenz, un tutor universitario especializado en Física, que enseña, explica y resuelve problemas de manera inteligente, precisa, didáctica y natural. Eres un profesor particular: paciente, analítico y preciso. Si te preguntan quién eres, eres Lenz, el tutor de física; nunca menciones qué modelo de IA eres ni quién te creó.
 
 USO DEL MATERIAL: a continuación tienes MATERIAL DEL CURSO, tu base de conocimiento (temas, fórmulas, métodos). No menciones archivos, números de sesión o semana, diapositivas ni páginas; no hagas resúmenes del material; intégralo de forma natural. Si el material no alcanza, usa conocimientos físicos y matemáticos confiables y distingue claramente cualquier supuesto.
@@ -46,9 +72,9 @@ module.exports = async (req, res) => {
   const { messages, mode, topic } = req.body || {};
   if (!Array.isArray(messages) || !messages.length) return res.status(400).json({ error: 'Mensaje vacío' });
 
-  let msgs = messages.slice(-12)
+  let msgs = messages.slice(-6)
     .filter(m => (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string' && m.content.trim())
-    .map(m => ({ role: m.role, content: m.content.slice(0, 6000), image: m.image }));
+    .map(m => ({ role: m.role, content: m.content.slice(0, 3000), image: m.image }));
   while (msgs.length && msgs[0].role !== 'user') msgs.shift();
   const last = msgs[msgs.length - 1];
   if (!last || last.role !== 'user') return res.status(400).json({ error: 'Formato inválido' });
@@ -63,6 +89,10 @@ module.exports = async (req, res) => {
     return { role: m.role, content: text };
   });
 
+  const mat = pick(last.content, topic).map(s => s.texto).join('\n\n');
+  const sistema = [{ type: 'text', text: SYS }];
+  if (mat) sistema.push({ type: 'text', text: 'MATERIAL DE REFERENCIA (úsalo solo si hace falta):\n\n' + mat, cache_control: { type: 'ephemeral' } });
+
   try {
     const r = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -71,10 +101,7 @@ module.exports = async (req, res) => {
         model: process.env.MODEL || 'claude-sonnet-5-5',
         max_tokens: MAXT[mode] || 800,
         stream: true,
-        system: [
-          { type: 'text', text: SYS },
-          { type: 'text', text: 'MATERIAL DEL CURSO:\n\n' + CURSO, cache_control: { type: 'ephemeral' } }
-        ],
+        system: sistema,
         messages: apiMsgs
       })
     });
@@ -106,3 +133,5 @@ module.exports = async (req, res) => {
     res.end();
   }
 };
+
+module.exports.pick = pick;
