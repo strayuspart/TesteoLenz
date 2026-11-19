@@ -4,79 +4,87 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Lenz · Tutor de física</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
 <style>
-:root{--bg:#0d1117;--side:#111722;--card:#161d2b;--ink:#e6ebf4;--mut:#8a94a6;--line:#263042;--acc:#5b8cff;--acc2:#a06bff;--bot:#161d2b;--usr:#2a4fb8}
-@media (prefers-color-scheme:light){:root{--bg:#f5f7fb;--side:#fff;--card:#fff;--ink:#18202e;--mut:#5d6879;--line:#dde3ec;--acc:#2f6fed;--acc2:#7c4dff;--bot:#fff;--usr:#2f6fed}}
+:root{--bg:#e9edf3;--panel:rgba(246,248,252,.9);--ink:#141a26;--mut:#5a667a;--line:#c7cfdc;--acc:#3b6fe0;--fil:20,26,38;--sans:"Instrument Sans",system-ui,-apple-system,"Segoe UI",sans-serif;--disp:"Bricolage Grotesque","Instrument Sans",system-ui,sans-serif}
+@media (prefers-color-scheme:dark){:root{--bg:#0f1527;--panel:rgba(16,23,42,.88);--ink:#e7ecf6;--mut:#97a3ba;--line:#2a3550;--fil:200,212,240;color-scheme:dark}}
 *{box-sizing:border-box}html,body{height:100%}
-body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0)}
-#app{display:grid;grid-template-columns:270px 1fr;height:100%}
-@media(max-width:800px){#app{grid-template-columns:1fr}aside{display:none;position:fixed;inset:0 25% 0 0;z-index:5;box-shadow:0 0 40px #0008}aside.open{display:flex}}
-aside{background:var(--side);border-right:1px solid var(--line);padding:14px;display:flex;flex-direction:column;gap:10px;overflow-y:auto}
-.logo{display:flex;align-items:center;gap:10px}
-.mark{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,var(--acc),var(--acc2));display:grid;place-items:center;color:#fff;font-weight:800;font-size:20px}
-.logo b{font-size:20px;letter-spacing:.3px}.logo small{display:block;color:var(--mut);font-size:11px;margin-top:-3px}
-.lbl{font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.08em;margin-top:6px}
-.t,.btn{font:inherit;font-size:13px;text-align:left;padding:7px 10px;border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:9px;cursor:pointer}
-.t:hover,.btn:hover{border-color:var(--acc)}.t.on{background:var(--acc);border-color:var(--acc);color:#fff}
+body{margin:0;background:var(--bg);color:var(--ink);font:15.5px/1.6 var(--sans);padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0)}
+button:focus-visible,textarea:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+#bg{position:fixed;inset:0;width:100%;height:100%;z-index:0}
+#app{position:relative;z-index:1;display:grid;grid-template-columns:284px 1fr;height:100%}
+aside{background:var(--panel);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-right:1px solid var(--line);padding:18px 14px;display:flex;flex-direction:column;gap:12px;overflow-y:auto}
+.brand{display:flex;align-items:center;gap:11px}.brand svg{width:36px;height:36px;flex:none}
+.brand b{font:700 26px/1 var(--disp);letter-spacing:-.03em}.brand small{display:block;color:var(--mut);font-size:12.5px;margin-top:3px}
+.sb{font:inherit;font-size:13.5px;text-align:left;padding:8px 10px;border:1px solid var(--line);background:transparent;color:var(--ink);cursor:pointer;border-radius:3px}
+.sb:hover{border-color:var(--acc)}
+nav .gl{font:600 12.5px var(--sans);color:var(--mut);margin:15px 0 4px}
+.t{display:block;width:100%;font:inherit;font-size:13.5px;text-align:left;padding:6px 8px 6px 10px;margin:0;border:0;border-left:3px solid var(--c,var(--line));background:transparent;color:var(--ink);cursor:pointer;transition:background .15s,padding .15s}
+.t:hover{background:rgba(127,127,127,.13);padding-left:15px}.t.on{background:var(--c);color:#fff}
 main{display:flex;flex-direction:column;min-height:0;min-width:0}
-header{display:none;padding:8px 12px;border-bottom:1px solid var(--line);align-items:center;gap:10px}
-@media(max-width:800px){header{display:flex}}
-#log{flex:1;overflow-y:auto;padding:18px 14px;scroll-behavior:smooth}
-.w{max-width:820px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
-.m{padding:10px 14px;border-radius:14px;overflow-wrap:anywhere;max-width:100%}
-.u{align-self:flex-end;background:var(--usr);color:#fff;white-space:pre-wrap;max-width:85%}
-.b{background:var(--bot);border:1px solid var(--line)}
-.m p{margin:0 0 9px}.m p:last-child{margin:0}.m ul,.m ol{margin:0 0 9px;padding-left:22px}
-.m code{background:#7f7f7f33;padding:1px 5px;border-radius:5px;font-size:.9em}
-.m table{border-collapse:collapse;margin:6px 0;font-size:14px}.m td,.m th{border:1px solid var(--line);padding:4px 9px}
-.katex-display{overflow-x:auto;overflow-y:hidden;padding:2px 0}
-.fig{background:var(--bg);border:1px solid var(--line);border-radius:10px;margin:8px 0;padding:6px}.fig svg{width:100%;height:auto;max-height:360px}
+header{display:none;align-items:center;gap:10px;padding:8px 12px;background:var(--panel);border-bottom:1px solid var(--line)}
+header b{font:700 20px var(--disp)}
+#log{flex:1;overflow-y:auto;scroll-behavior:smooth}
+.w{max-width:800px;margin:0 auto;padding:20px 24px;display:flex;flex-direction:column;gap:20px;min-height:100%}
+.w:not(:has(.hero)){background:var(--panel);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border-inline:1px solid var(--line)}
+.m{overflow-wrap:anywhere;max-width:100%}
+.u{align-self:flex-end;background:var(--acc);color:#fff;padding:9px 14px;border-radius:14px 14px 3px 14px;max-width:85%;white-space:pre-wrap}
+.b{border-left:3px solid var(--acc);padding:2px 0 2px 16px}
+.m p{margin:0 0 10px}.m p:last-child{margin:0}.m ul,.m ol{margin:0 0 10px;padding-left:22px}
+.m code{background:rgba(127,127,127,.2);padding:1px 5px;border-radius:3px;font-size:.9em}
+.m table{border-collapse:collapse;margin:8px 0;font-size:14px}.m td,.m th{border:1px solid var(--line);padding:5px 10px}
+.katex-display{overflow-x:auto;overflow-y:hidden;padding:3px 0}
+.fig{border:1px solid var(--line);margin:10px 0;padding:8px;background:rgba(127,127,127,.06)}.fig svg{width:100%;height:auto;max-height:360px}
 .cur::after{content:"▍";color:var(--acc);animation:bl 1s steps(2) infinite}@keyframes bl{50%{opacity:0}}
-.hero{text-align:center;margin:8vh 0 18px}.hero h2{font-size:30px;margin:0 0 6px;background:linear-gradient(90deg,var(--acc),var(--acc2));-webkit-background-clip:text;background-clip:text;color:transparent}
-.hero p{color:var(--mut);margin:0}
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
-.cards button{font:inherit;font-size:13px;text-align:left;padding:12px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
-.cards button:hover{border-color:var(--acc)}
-footer{padding:8px 14px 12px;border-top:1px solid var(--line)}
-.bar{max-width:820px;margin:0 auto}
-.modes{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;align-items:center}
-.modes button{font:inherit;font-size:12px;padding:4px 11px;border-radius:99px;border:1px solid var(--line);background:transparent;color:var(--mut);cursor:pointer}
-.modes button.on{background:var(--acc);border-color:var(--acc);color:#fff}
-.chip{font-size:12px;color:var(--mut)}.chip a{cursor:pointer;color:var(--acc)}
+.hero{margin:5vh 0 6px}
+.hero h2{font:700 clamp(32px,5.2vw,54px)/1.02 var(--disp);letter-spacing:-.035em;margin:0 0 16px;max-width:13ch}
+.hero p{max-width:48ch;color:var(--mut);margin:0 0 26px;font-size:17px}
+.ideas{display:flex;flex-direction:column;max-width:580px;background:var(--panel);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:1px solid var(--line)}
+.ideas button{font:inherit;text-align:left;padding:12px 14px;border:0;border-top:1px solid var(--line);border-left:4px solid var(--c);background:transparent;color:var(--ink);cursor:pointer;transition:padding .15s,background .15s}
+.ideas button:first-child{border-top:0}.ideas button:hover{padding-left:20px;background:rgba(127,127,127,.12)}
+footer{padding:0 16px 14px}
+.bar{max-width:800px;margin:0 auto;background:var(--panel);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid var(--line);padding:10px 12px}
+.modes{display:flex;gap:18px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
+.modes button{font:inherit;font-size:13.5px;padding:2px 0;border:0;border-bottom:2px solid transparent;background:transparent;color:var(--mut);cursor:pointer}
+.modes button.on{color:var(--ink);border-color:var(--acc)}
+.chip{font-size:12.5px;color:var(--mut)}.chip a{cursor:pointer;color:var(--acc);text-decoration:underline}
 form{display:flex;gap:8px;align-items:flex-end}
-textarea{flex:1;font:inherit;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink);resize:none;min-width:0;max-height:150px}
-.ib{font:inherit;padding:10px 13px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
-.go{background:linear-gradient(135deg,var(--acc),var(--acc2));border:0;color:#fff;font-weight:600}
+textarea{flex:1;font:inherit;padding:9px 11px;border-radius:3px;border:1px solid var(--line);background:transparent;color:var(--ink);resize:none;min-width:0;max-height:150px}
+.ib{font:inherit;padding:9px 12px;border-radius:3px;border:1px solid var(--line);background:transparent;color:var(--ink);cursor:pointer}
+.go{background:var(--acc);border-color:var(--acc);color:#fff;font-weight:600}
+@media(max-width:800px){#app{grid-template-columns:1fr;grid-template-rows:auto 1fr}header{display:flex}
+aside{position:fixed;inset:0 20% 0 0;z-index:5;transform:translateX(-105%);transition:transform .25s;box-shadow:0 0 40px #0006}aside.open{transform:none}
+.w{padding:16px}.hero{margin-top:5vh}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
 <body>
+<canvas id="bg" aria-hidden="true"></canvas>
 <div id="app">
 <aside id="side">
-  <div class="logo"><div class="mark">L</div><div><b>Lenz</b><small>Tutor de física aplicada</small></div></div>
-  <button class="btn" id="new">＋ Nueva conversación</button>
-  <div class="lbl">Tema</div>
-  <button class="t on" data-t="">✨ Todo el curso</button>
-  <div id="topics" style="display:flex;flex-direction:column;gap:5px"></div>
-  <div class="lbl">Conversación</div>
-  <button class="btn" id="dl">⬇ Descargar apuntes</button>
+  <div class="brand"><svg viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="9" fill="var(--acc)"/><g fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M12 28c0-12 16-12 16 0"/><path d="M7 28C7 9 33 9 33 28" opacity=".6"/></g><circle cx="12" cy="29" r="2.6" fill="#fff"/><circle cx="28" cy="29" r="2.6" fill="#fff" opacity=".55"/></svg><div><b>Lenz</b><small>Tutor de física aplicada</small></div></div>
+  <button class="sb" id="new">Nueva conversación</button>
+  <nav id="topics"></nav>
+  <button class="sb" id="dl">Descargar apuntes</button>
 </aside>
 <main>
-  <header><button class="ib" id="menu">☰</button><b>Lenz</b></header>
+  <header><button class="ib" id="menu" aria-label="Temas">☰</button><b>Lenz</b></header>
   <div id="log"><div class="w" id="w"></div></div>
   <footer><div class="bar">
     <div class="modes" id="modes">
-      <button data-m="explicar" class="on">💡 Explicar</button>
-      <button data-m="resolver">🧮 Resolver paso a paso</button>
-      <button data-m="practicar">🎯 Practicar</button>
-      <button data-m="repaso">📋 Repaso</button>
+      <button data-m="explicar" class="on">Explicar</button>
+      <button data-m="resolver">Resolver paso a paso</button>
+      <button data-m="practicar">Practicar</button>
+      <button data-m="repaso">Repaso</button>
       <span class="chip" id="chip"></span>
     </div>
     <div class="chip" id="pic" style="margin-bottom:4px"></div>
     <form id="f">
       <input type="file" id="file" accept="image/*" hidden>
       <button type="button" class="ib" id="clip" title="Adjuntar foto de un problema">📎</button>
-      <textarea id="q" rows="1" placeholder="Pregunta, pega un problema o adjunta una foto…"></textarea>
+      <textarea id="q" rows="1" placeholder="Escribe tu duda, pega un problema o adjunta una foto"></textarea>
       <button class="ib go" id="send">Enviar</button>
     </form>
   </div></footer>
@@ -94,8 +102,12 @@ const $=id=>document.getElementById(id),log=$('log'),W=$('w');
 let topic='',mode='explicar',busy=false,pic=null,chat=[];
 try{chat=JSON.parse(localStorage.getItem('lenz.chat')||'[]')}catch(e){}
 const save=()=>{try{localStorage.setItem('lenz.chat',JSON.stringify(chat.slice(-60)))}catch(e){}};
-TOPICS.forEach(n=>{const b=document.createElement('button');b.className='t';b.dataset.t=n;b.textContent=n;$('topics').appendChild(b)});
-document.querySelectorAll('.t').forEach(b=>b.onclick=()=>{topic=b.dataset.t;document.querySelectorAll('.t').forEach(x=>x.classList.toggle('on',x===b));$('side').classList.remove('open')});
+const GROUPS=[['Electrostática','#e4572e',[0,1,2]],['Circuitos de corriente continua','#1f8a9e',[3,4,5,6]],['Magnetismo','#7a5cc2',[7,8,9]],['Corriente alterna','#3b6fe0',[10,11]],['Electrónica','#2fa866',[12,13]]];
+const nav=$('topics');
+const mk=(x,t,c)=>{const b=document.createElement('button');b.className='t';b.dataset.t=t;b.dataset.c=c;b.style.setProperty('--c',c);b.textContent=x;nav.appendChild(b);return b};
+mk('Todo el curso','','#3b6fe0').classList.add('on');
+GROUPS.forEach(([g,c,ix])=>{const l=document.createElement('div');l.className='gl';l.textContent=g;nav.appendChild(l);ix.forEach(i=>mk(TOPICS[i],TOPICS[i],c))});
+document.querySelectorAll('.t').forEach(b=>b.onclick=()=>{topic=b.dataset.t;document.querySelectorAll('.t').forEach(x=>x.classList.toggle('on',x===b));const c=b.dataset.c;document.documentElement.style.setProperty('--acc',c);window.lenzAcc&&window.lenzAcc(c);$('side').classList.remove('open')});
 $('modes').querySelectorAll('button').forEach(b=>b.onclick=()=>{mode=b.dataset.m;$('modes').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b))});
 $('menu').onclick=()=>$('side').classList.toggle('open');
 const esc=s=>s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
@@ -137,8 +149,9 @@ function show(el,text,live){
 const near=()=>log.scrollHeight-log.scrollTop-log.clientHeight<140;
 function add(t,c,live){const d=document.createElement('div');d.className='m '+c;if(c==='u')d.textContent=t;else show(d,t,live);W.appendChild(d);log.scrollTop=log.scrollHeight;return d}
 function hero(){
-  W.innerHTML='<div class="hero"><h2>Hola, soy '+NAME+'</h2><p>Tu tutor de física: explico, resuelvo paso a paso, grafico y te hago practicar.</p></div><div class="cards" id="cards"></div>';
-  IDEAS.forEach(t=>{const b=document.createElement('button');b.textContent=t;b.onclick=()=>ask(t);$('cards').appendChild(b)});
+  W.innerHTML='<div class="hero"><h2>¿Qué tema se te atascó hoy?</h2><p>Explico desde la intuición, resuelvo paso a paso, grafico y te pongo a practicar. Elige un tema en el menú o empieza con una de estas:</p><div class="ideas" id="ideas"></div></div>';
+  const C=['#7a5cc2','#1f8a9e','#1f8a9e','#2fa866','#2fa866','#3b6fe0'];
+  IDEAS.forEach((t,i)=>{const b=document.createElement('button');b.textContent=t;b.style.setProperty('--c',C[i]);b.onclick=()=>ask(t);$('ideas').appendChild(b)});
 }
 function render(){W.innerHTML='';if(!chat.length)return hero();chat.forEach(m=>add(m.content,m.role==='user'?'u':'b'))}
 async function toB64(file){
@@ -173,6 +186,36 @@ $('q').oninput=e=>{e.target.style.height='auto';e.target.style.height=Math.min(e
 $('new').onclick=()=>{if(busy)return;chat=[];save();render();$('side').classList.remove('open')};
 $('dl').onclick=()=>{const t=chat.map(m=>(m.role==='user'?'## Pregunta\n':'## '+NAME+'\n')+m.content).join('\n\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:'text/markdown'}));a.download='apuntes-lenz.md';a.click()};
 render();
+</script>
+<script>
+// Fondo: limaduras de hierro alrededor de un dipolo que sigue al cursor (se tiñe con el color del tema)
+(()=>{
+const cv=document.getElementById('bg'),c=cv.getContext('2d'),rm=matchMedia('(prefers-reduced-motion: reduce)').matches;
+let w,h,mx,my,px,py,last=0,fil='20,26,38',acc='59,111,224',fr=0,t0=performance.now(),prev=0;
+const rgb=x=>{x=x.replace('#','');return [0,2,4].map(i=>parseInt(x.substr(i,2),16)).join(',')};
+window.lenzAcc=x=>{acc=rgb(x);if(rm)draw(performance.now())};
+function size(){const d=Math.min(devicePixelRatio||1,2);w=innerWidth;h=innerHeight;cv.width=w*d;cv.height=h*d;c.setTransform(d,0,0,d,0,0);if(px==null){mx=px=w*.7;my=py=h*.45}if(rm)draw(performance.now())}
+addEventListener('resize',size);
+addEventListener('pointermove',e=>{if(e.pointerType==='mouse'){mx=e.clientX;my=e.clientY;last=performance.now()}});
+function draw(t){
+  if(!(fr++%30))fil=getComputedStyle(document.documentElement).getPropertyValue('--fil').trim()||fil;
+  if(t-last>4000&&!rm){mx=w*.7+Math.cos(t*.0004)*w*.13;my=h*.45+Math.sin(t*.0006)*h*.2}
+  if(!rm){px+=(mx-px)*.07;py+=(my-py)*.07}
+  const a=rm?0:t*.00028,ca=Math.cos(-a),sa=Math.sin(-a),cb=Math.cos(a),sb=Math.sin(a),S=28,intro=rm?9:Math.min(1,(t-t0)/1500),R=intro*Math.hypot(w,h)*.8;
+  const P=[0,1,2,3].map(()=>new Path2D()),A=new Path2D();
+  for(let y=S/2;y<h;y+=S)for(let x=S/2;x<w;x+=S){
+    const dx=x-px,dy=y-py;if(Math.hypot(dx,dy)>R)continue;
+    const lx=dx*ca-dy*sa,ly=dx*sa+dy*ca,r=Math.max(Math.hypot(lx,ly),30),ux=lx/r,uy=ly/r;
+    const bx=3*ux*ux-1,by=3*ux*uy,X=bx*cb-by*sb,Y=bx*sb+by*cb,g=Math.atan2(Y,X);
+    const st=Math.min(1,Math.sqrt(1+3*ux*ux)*Math.pow(110/r,3)),L=(7+11*st)/2,ox=Math.cos(g)*L,oy=Math.sin(g)*L;
+    const k=st>.55?A:P[Math.min(3,Math.floor(st*6))];k.moveTo(x-ox,y-oy);k.lineTo(x+ox,y+oy)}
+  c.clearRect(0,0,w,h);c.lineWidth=1.4;c.lineCap='round';
+  [.16,.26,.38,.55].forEach((al,i)=>{c.strokeStyle='rgba('+fil+','+al+')';c.stroke(P[i])});
+  c.strokeStyle='rgba('+acc+',.85)';c.lineWidth=1.8;c.stroke(A);
+}
+function loop(t){if(t-prev>33){prev=t;draw(t)}requestAnimationFrame(loop)}
+size();if(rm)draw(performance.now());else requestAnimationFrame(loop);
+})();
 </script>
 </body>
 </html>
