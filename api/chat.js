@@ -20,10 +20,14 @@ const KW = [
   'zener,regulacion,union pn,polarizacion'
 ].map(s => s.split(','));
 const norm = s => String(s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+const near = (a, b) => { if (a === b) return true; if (a.length < 5 || Math.abs(a.length - b.length) > 1) return false; let i = 0; while (i < a.length && a[i] === b[i]) i++;
+  if (a.length === b.length) return a.slice(i + 1) === b.slice(i + 1) || (a[i] === b[i + 1] && a[i + 1] === b[i] && a.slice(i + 2) === b.slice(i + 2));
+  const [l, s] = a.length > b.length ? [a, b] : [b, a]; return l.slice(i + 1) === s.slice(i); };
 function pick(texto, tema) {
   if (tema) { const s = SECC.find(x => x.nombre === tema); if (s) return [s]; }
   const n = norm(texto);
-  return SECC.map((s, i) => ({ s, p: (KW[i] || []).reduce((a, k) => a + ((k.length <= 3 ? new RegExp('\\b' + k + '\\b').test(n) : n.includes(k)) ? (k.length > 5 ? 2 : 1) : 0), 0) }))
+  const W = n.split(/[^a-z0-9]+/), hit = k => n.includes(k) || (k.length >= 5 && !k.includes(' ') && W.some(w => near(w, k)));
+  return SECC.map((s, i) => ({ s, p: (KW[i] || []).reduce((a, k) => a + ((k.length <= 3 ? new RegExp('\\b' + k + '\\b').test(n) : hit(k)) ? (k.length > 5 ? 2 : 1) : 0), 0) }))
     .filter(o => o.p > 0).sort((a, b) => b.p - a.p).slice(0, 2).map(o => o.s);
 }
 
@@ -35,9 +39,11 @@ FORMA DE ENSEÑAR: no solo des respuestas, busca que el estudiante comprenda. Al
 
 RAZONAMIENTO: entiende preguntas informales o incompletas (pide aclaración si hace falta), relaciona conceptos, detecta errores en los procedimientos del estudiante, no inventes datos ni resultados y verifica con cuidado cada operación antes de responder.
 
+ORTOGRAFÍA: el estudiante puede escribir con errores o de forma informal; interpreta lo que quiso decir y responde sin comentar los errores.
+
 LONGITUD (muy importante): responde en proporción a la pregunta. Saludos o preguntas simples: 1 a 3 frases. Conceptos: uno o dos párrafos cortos con la fórmula clave. Aplica los 9 pasos solo en problemas numéricos y de forma compacta. No uses encabezados ni listas largas si no hacen falta, no repitas la pregunta ni agregues resúmenes, y cierra con una sola pregunta corta como máximo. No hagas gráficos ni diagramas salvo que se pidan o sean imprescindibles.
 
-LABORATORIO CON LOS DATOS DEL PROBLEMA: cuando el estudiante plantee un problema numérico de alguno de estos tipos, resuélvelo y al final agrega UN solo bloque de código con la etiqueta lab y un JSON de una línea con los datos del problema (la página lo convierte en un laboratorio interactivo con gráficos). Tipos y unidades: {"t":"coulomb","q1":3,"q2":-5,"r":20} (cargas en µC, r en cm); {"t":"rc","R":10,"C":100,"V":12,"tm":1} (R en kΩ, C en µF, tm en múltiplos de τ); {"t":"faraday","N":200,"A":100,"B0":0,"B1":0.5,"dt":0.1} (A en cm², B en T, dt en s); {"t":"rlc","R":30,"XL":60,"XC":20,"V":100} (Ω y V RMS); {"t":"lorentz","q":2,"m":1,"v":300000,"B":0.4} (q en µC, m en mg, v en m/s, B en T); {"t":"magnet","S":60,"a":0,"cx":75,"cy":30} (intensidad %, giro en grados, posición de la brújula en %). Si falta un dato en el enunciado, usa un valor razonable. No uses este bloque en saludos, en preguntas teóricas ni en tipos no listados.
+LABORATORIO (ahorra tokens): en problemas numéricos de estos tipos, después de resolverlos agrega UN bloque de código con etiqueta lab y un JSON de una línea. La página dibuja sola el circuito o el esquema, así que NUNCA dibujes circuitos con svg ni gráficas con plot en estos casos. Tipos: {"t":"dc","V":12,"R1":4,"R2":6,"m":1} (m=1 paralelo, 0 serie; V y Ω); {"t":"rc","R":10,"C":100,"V":12,"tm":1} (kΩ, µF, tm en múltiplos de τ); {"t":"rlc","R":30,"XL":60,"XC":20,"V":100,"f":60} (Ω, V RMS, Hz); {"t":"coulomb","q1":3,"q2":-5,"r":20} (µC, cm); {"t":"faraday","N":200,"A":100,"B0":0,"B1":0.5,"dt":0.1} (cm², T, s); {"t":"lorentz","q":2,"m":1,"v":300000,"B":0.4} (µC, mg, m/s, T); {"t":"magnet","S":60,"a":0,"cx":75,"cy":30}. Agrega "g" solo si el enunciado pide una gráfica o una frecuencia: "t" (respuesta en el tiempo, para rc y faraday), "f" (respuesta en frecuencia, para rlc), "wave" (v(t) e i(t), para rlc), "r" (fuerza contra distancia, coulomb), "d" (campo contra distancia, magnet). Sin "g" no se dibujan gráficas. No uses el bloque en saludos ni en preguntas teóricas.
 
 HERRAMIENTAS VISUALES (solo cuando ayuden de verdad): para una gráfica escribe un bloque de código con la etiqueta plot y JSON válido {"title":"","xlabel":"","ylabel":"","series":[{"name":"","x":[...],"y":[...]}]} con 30 a 60 puntos calculados. Para circuitos, fuerzas, campos o diagramas escribe un bloque de código con la etiqueta svg que contenga un <svg viewBox="0 0 600 340"> con trazos y textos de color #8a94a6 y fuente de 14 px, sin scripts. Explica lo que muestra. Si el estudiante adjunta una imagen, interprétala con cuidado.
 
@@ -52,7 +58,7 @@ const MODOS = {
   repaso: 'MODO REPASO: da las ideas clave, las fórmulas esenciales con cuándo usar cada una, los errores comunes y 3 preguntas de autoevaluación sin respuesta.'
 };
 
-const MAXT = { explicar: 700, resolver: 1600, practicar: 900, repaso: 1000 };
+const MAXT = { explicar: 1500, resolver: 2200, practicar: 1600, repaso: 1500 };
 const hits = new Map();
 const TIPOS = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
 
@@ -117,6 +123,7 @@ module.exports = async (req, res) => {
     res.setHeader('X-Accel-Buffering', 'no');
     const dec = new TextDecoder();
     let buf = '';
+    let sent = false, why = '';
     for await (const chunk of r.body) {
       buf += dec.decode(chunk, { stream: true });
       let i;
@@ -125,10 +132,13 @@ module.exports = async (req, res) => {
         if (!line.startsWith('data:')) continue;
         try {
           const ev = JSON.parse(line.slice(5));
-          if (ev.type === 'content_block_delta' && ev.delta && ev.delta.type === 'text_delta') res.write(ev.delta.text);
+          if (ev.type === 'content_block_delta' && ev.delta && ev.delta.type === 'text_delta') { sent = true; res.write(ev.delta.text); }
+          else if (ev.type === 'message_delta' && ev.delta && ev.delta.stop_reason) why = ev.delta.stop_reason;
+          else if (ev.type === 'error') why = (ev.error && ev.error.type) || 'error';
         } catch (e) {}
       }
     }
+    if (!sent) res.write('No pude generar la respuesta esta vez (' + (why || 'sin respuesta') + '). Vuelve a enviar tu mensaje.');
     res.end();
   } catch (e) {
     if (!res.headersSent) return res.status(500).json({ error: 'Error del servidor.' });
