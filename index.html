@@ -310,20 +310,31 @@ async function ask(text){
   add(text+(pic?'  [imagen adjunta]':''),'u');const out=add('','b',true);
   const img=pic;pic=null;$('pic').textContent='';$('file').value='';
   const msgs=chat.map(m=>({role:m.role,content:m.content})).concat([{role:'user',content:text,image:img||undefined}]);
-  let acc='',raf=0;
+  let acc='',raf=0,tm=0;const ctl=new AbortController(),arm=()=>{clearTimeout(tm);tm=setTimeout(()=>ctl.abort(),30000)},clean=()=>acc.replace(/\u0003/g,'');
   try{
-    const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json','x-code':localStorage.getItem('lenz.code')||''},body:JSON.stringify({messages:msgs,mode,topic})});
+    arm();
+    const r=await fetch('/api/chat',{method:'POST',signal:ctl.signal,headers:{'Content-Type':'application/json','x-code':localStorage.getItem('lenz.code')||''},body:JSON.stringify({messages:msgs,mode,topic})});
     if(r.status===401){const c=prompt('Código de acceso:');if(c)localStorage.setItem('lenz.code',c);throw new Error('Escribe de nuevo tu pregunta con el código.')}
     if(!r.ok){let m='No pude responder.';try{m=(await r.json()).error||m}catch(e){}throw new Error(m)}
     const rd=r.body.getReader(),dc=new TextDecoder();
-    for(;;){const{done,value}=await rd.read();if(done)break;acc+=dc.decode(value,{stream:true});
-      if(!raf)raf=requestAnimationFrame(()=>{raf=0;const n=near();show(out,acc,true);if(n)log.scrollTop=log.scrollHeight})}
-    cancelAnimationFrame(raf);
-    if(!acc.trim()){show(out,'No recibí respuesta esta vez. Vuelve a enviar tu mensaje.',false)}
-    else{show(out,acc,false);if(!/^No pude generar/.test(acc)){simChips(out.parentNode,text+' '+acc);chat.push({role:'user',content:text},{role:'assistant',content:acc});save()}}
-  }catch(e){out.classList.remove('cur');out.textContent=e.message||'No pude responder. Intenta de nuevo.'}
+    for(;;){const{done,value}=await rd.read();if(done)break;arm();acc+=dc.decode(value,{stream:true});
+      if(!raf)raf=requestAnimationFrame(()=>{raf=0;const n=near();show(out,clean(),true);if(n)log.scrollTop=log.scrollHeight})}
+  }catch(e){
+    if(!acc.trim()){clearTimeout(tm);cancelAnimationFrame(raf);out.classList.remove('cur');out.textContent=(e&&e.name==='AbortError')?'La respuesta tardó demasiado. Vuelve a enviar tu mensaje.':(e.message||'No pude responder. Intenta de nuevo.');busy=false;return}
+  }
+  clearTimeout(tm);cancelAnimationFrame(raf);
+  const ok=acc.includes('\u0003');let t=clean();
+  if(!t.trim()){show(out,'No recibí respuesta esta vez. Vuelve a enviar tu mensaje.',false)}
+  else{
+    if(!ok&&!/\(La respuesta se/.test(t))t+='\n\n*(La respuesta se interrumpió.)*';
+    const cut=/\(La respuesta se (cortó|interrumpió)/.test(t);
+    show(out,t,false);
+    if(!/^No pude generar/.test(t)){simChips(out.parentNode,text+' '+t);chat.push({role:'user',content:text},{role:'assistant',content:t});save()}
+    if(cut)contBtn(out.parentNode);
+  }
   busy=false;
 }
+function contBtn(w){if(!w||!w.classList||!w.classList.contains('mw'))return;const r=document.createElement('div');r.className='scs';const b=document.createElement('button');b.type='button';b.textContent='Continuar la respuesta';b.onclick=()=>{r.remove();ask('continúa')};r.appendChild(b);w.appendChild(r)}
 $('f').onsubmit=e=>{e.preventDefault();const v=$('q').value;$('q').value='';$('q').style.height='';ask(v)};
 $('q').onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();$('f').requestSubmit()}};
 $('q').oninput=e=>{e.target.style.height='auto';e.target.style.height=Math.min(e.target.scrollHeight,150)+'px'};
