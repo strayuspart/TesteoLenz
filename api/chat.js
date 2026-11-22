@@ -53,7 +53,7 @@ HONESTIDAD: si no sabes algo o no hay información suficiente, dilo. Nunca inven
 
 const MODOS = {
   explicar: 'MODO EXPLICAR: explica el concepto desde la intuición (con un ejemplo cotidiano) hasta la fórmula, y cierra con una pregunta corta para comprobar que se entendió.',
-  resolver: 'MODO RESOLVER: resuelve el problema aplicando los 9 pasos, con unidades y comprobación final.',
+  resolver: 'MODO RESOLVER: resuelve con los 9 pasos pero de forma compacta: cada paso en una o dos líneas, sin encabezados ni negritas por paso, cada ecuación en una sola línea y sin repetir los datos. Máximo unas 300 palabras salvo que el problema sea realmente largo.',
   practicar: 'MODO PRACTICAR: si no hay un problema pendiente, propón UN problema nuevo de nivel universitario sobre el tema, sin dar la solución, y espera la respuesta del estudiante. Si ya propusiste uno, evalúa la respuesta del estudiante, da pistas progresivas si falla y muestra la solución completa solo cuando la pida o la acierte.',
   repaso: 'MODO REPASO: da las ideas clave, las fórmulas esenciales con cuándo usar cada una, los errores comunes y 3 preguntas de autoevaluación sin respuesta.'
 };
@@ -101,23 +101,22 @@ module.exports = async (req, res) => {
   const sistema = [{ type: 'text', text: SYS }];
   if (mat) sistema.push({ type: 'text', text: 'MATERIAL DE REFERENCIA (úsalo solo si hace falta):\n\n' + mat, cache_control: { type: 'ephemeral' } });
 
+  const ctl = new AbortController();
+  const tm = setTimeout(() => ctl.abort(), 50000);
+  const llamar = extra => fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST', signal: ctl.signal,
+    headers: { 'content-type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01' },
+    body: JSON.stringify(Object.assign({ model: process.env.MODEL || 'claude-sonnet-5-5', max_tokens: MAXT[mode] || 800, stream: true, system: sistema, messages: apiMsgs }, extra))
+  });
+  const fallo = t => res.status(502).json({ error: /credit|balance/i.test(t) ? 'Se acabó el saldo de la API.' : 'La IA no respondió. Intenta de nuevo.' });
   try {
-    const r = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json', 'x-api-key': key, 'anthropic-version': '2023-06-01' },
-      body: JSON.stringify({
-        model: process.env.MODEL || 'claude-sonnet-5-5',
-        max_tokens: MAXT[mode] || 800,
-        stream: true,
-        system: sistema,
-        messages: apiMsgs
-      })
-    });
-    if (!r.ok) {
-      const t = await r.text().catch(() => '');
-      const sinSaldo = /credit|balance/i.test(t);
-      return res.status(502).json({ error: sinSaldo ? 'Se acabó el saldo de la API.' : 'La IA no respondió. Intenta de nuevo.' });
+    let r = await llamar({ thinking: { type: 'disabled' } });
+    if (r.status === 400) {
+      const t0 = await r.text().catch(() => '');
+      if (!/thinking/i.test(t0)) { clearTimeout(tm); return fallo(t0); }
+      r = await llamar({});
     }
+    if (!r.ok) { const t1 = await r.text().catch(() => ''); clearTimeout(tm); return fallo(t1); }
     res.setHeader('Content-Type', 'text/plain; charset=utf-8');
     res.setHeader('Cache-Control', 'no-cache, no-transform');
     res.setHeader('X-Accel-Buffering', 'no');
@@ -138,10 +137,15 @@ module.exports = async (req, res) => {
         } catch (e) {}
       }
     }
+    clearTimeout(tm);
     if (!sent) res.write('No pude generar la respuesta esta vez (' + (why || 'sin respuesta') + '). Vuelve a enviar tu mensaje.');
+    else if (why === 'max_tokens') res.write('\n\n*(La respuesta se cortó por longitud.)*');
+    res.write('\u0003');
     res.end();
   } catch (e) {
-    if (!res.headersSent) return res.status(500).json({ error: 'Error del servidor.' });
+    clearTimeout(tm);
+    if (!res.headersSent) return res.status(500).json({ error: e && e.name === 'AbortError' ? 'La IA tardó demasiado. Intenta de nuevo.' : 'Error del servidor.' });
+    res.write('\n\n*(La respuesta se interrumpió.)*\u0003');
     res.end();
   }
 };
