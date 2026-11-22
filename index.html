@@ -318,8 +318,9 @@ async function ask(text){
     const rd=r.body.getReader(),dc=new TextDecoder();
     for(;;){const{done,value}=await rd.read();if(done)break;acc+=dc.decode(value,{stream:true});
       if(!raf)raf=requestAnimationFrame(()=>{raf=0;const n=near();show(out,acc,true);if(n)log.scrollTop=log.scrollHeight})}
-    cancelAnimationFrame(raf);show(out,acc,false);simChips(out.parentNode,text+' '+acc);
-    chat.push({role:'user',content:text},{role:'assistant',content:acc});save();
+    cancelAnimationFrame(raf);
+    if(!acc.trim()){show(out,'No recibí respuesta esta vez. Vuelve a enviar tu mensaje.',false)}
+    else{show(out,acc,false);if(!/^No pude generar/.test(acc)){simChips(out.parentNode,text+' '+acc);chat.push({role:'user',content:text},{role:'assistant',content:acc});save()}}
   }catch(e){out.classList.remove('cur');out.textContent=e.message||'No pude responder. Intenta de nuevo.'}
   busy=false;
 }
@@ -363,68 +364,101 @@ function buildLab(){const L=$('lab');L.innerHTML='<div class="lw"><h2>Laboratori
     it.forEach(x=>{const b=document.createElement('button');b.className='lc';b.style.setProperty('--c',c);b.innerHTML='<span class="th"><img alt="" loading="lazy" src="https://phet.colorado.edu/sims/html/'+x.s+'/latest/'+x.s+'-600.png" onerror="this.remove()"></span><b>'+x.n+'</b><small>'+x.d+'</small>';b.onclick=()=>openSim(x);gr.appendChild(b)});w.append(h,gr)});
   const n=document.createElement('p');n.className='nt';n.textContent='Electrónica (diodos y rectificadores): PhET no tiene una simulación de diodos en HTML5, así que ese tema se trabaja con el tutor.';w.appendChild(n)}
 buildLab();
-function simsFor(text){const n=nrm(text);return SIMS.map(x=>({x,s:(topic&&x.t.some(i=>TOPICS[i]===topic)?3:0)+x.k.split(',').filter(k=>n.includes(nrm(k))).length*2})).filter(o=>o.s>=2).sort((a,b)=>b.s-a.s).slice(0,2).map(o=>o.x)}
+function simsFor(text){const n=nrm(text);return SIMS.map(x=>({x,s:(topic&&x.t.some(i=>TOPICS[i]===topic)?3:0)+x.k.split(',').filter(k=>{k=nrm(k);return n.includes(k)||(k.length>=5&&!k.includes(' ')&&n.split(/[^a-z0-9]+/).some(w=>fz(w,k)))}).length*2})).filter(o=>o.s>=2).sort((a,b)=>b.s-a.s).slice(0,2).map(o=>o.x)}
 function simChips(w,text){if(!w||!w.classList||!w.classList.contains('mw'))return;const l=simsFor(text);if(!l.length)return;const r=document.createElement('div');r.className='scs';l.forEach(x=>{const b=document.createElement('button');b.innerHTML=PLAY+'Abrir simulación: '+x.n;b.onclick=()=>openSim(x);r.appendChild(b)});w.appendChild(r)}
 document.querySelectorAll('.t').forEach(b=>b.addEventListener('click',()=>{const l=SIMS.filter(x=>x.t.some(i=>TOPICS[i]===topic));$('simbtn').hidden=!l.length;$('simbtn').dataset.s=l.length?SIMS.indexOf(l[0]):''}));
 $('simbtn').onclick=()=>{const i=$('simbtn').dataset.s;if(i!=='')openSim(SIMS[+i])};
 
+const fz=(a,b)=>{if(a===b)return true;if(a.length<5||Math.abs(a.length-b.length)>1)return false;let i=0;while(i<a.length&&a[i]===b[i])i++;if(a.length===b.length)return a.slice(i+1)===b.slice(i+1)||(a[i]===b[i+1]&&a[i+1]===b[i]&&a.slice(i+2)===b.slice(i+2));const[l,t]=a.length>b.length?[a,b]:[b,a];return l.slice(i+1)===t.slice(i)};
 const K9=8.99e9,cs=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim(),g3=v=>+Number(v).toPrecision(3);
-function gph(cv,g,p){const x=cv.getContext('2d'),W=cv.width,H=cv.height,L=50,R=12,T=24,B=36;x.clearRect(0,0,W,H);
- const [a,b]=g.xr(p),N=140,xs=[...Array(N+1)].map((_,i)=>a+(b-a)*i/N),ser=g.S.map(s=>({s,y:xs.map(t=>s.f(p,t))})),all=ser.flatMap(o=>o.y);
+function gph(cv,g,p){const x=cv.getContext('2d'),W=cv.width,H=cv.height,L=52,R=12,T=24,B=36;x.clearRect(0,0,W,H);
+ const [a,b]=g.xr(p),N=160,xs=[...Array(N+1)].map((_,i)=>a+(b-a)*i/N),ser=g.S.map(s=>({s,y:xs.map(t=>s.f(p,t))})),all=ser.flatMap(o=>o.y);
  let lo=Math.min(0,...all),hi=Math.max(...all);if(hi===lo)hi=lo+1;
- const X=v=>L+(v-a)/(b-a||1)*(W-L-R),Y=v=>H-B-(v-lo)/(hi-lo)*(H-T-B),ink=cs('--mut'),fm=v=>Math.abs(v)>=1e4||(Math.abs(v)<.01&&v!==0)?v.toExponential(1):g3(v);
+ const X=v=>L+(v-a)/(b-a||1)*(W-L-R),Y=v=>H-B-(v-lo)/(hi-lo)*(H-T-B),ink=cs('--mut'),fm=v=>Math.abs(v)>=1e5||(Math.abs(v)<.01&&v!==0)?v.toExponential(1):g3(v);
  x.font='11px system-ui';x.strokeStyle=ink;x.fillStyle=ink;
  for(let i=0;i<=4;i++){const u=a+(b-a)*i/4,w=lo+(hi-lo)*i/4;x.globalAlpha=.22;x.beginPath();x.moveTo(X(u),T);x.lineTo(X(u),H-B);x.moveTo(L,Y(w));x.lineTo(W-R,Y(w));x.stroke();x.globalAlpha=1;x.textAlign='center';x.fillText(fm(u),X(u),H-B+14);x.textAlign='right';x.fillText(fm(w),L-5,Y(w)+4)}
- x.textAlign='center';x.fillText(g.x,(L+W-R)/2,H-6);x.save();x.translate(11,(T+H-B)/2);x.rotate(-Math.PI/2);x.fillText(g.y,0,0);x.restore();
+ x.textAlign='center';x.fillText(typeof g.x==='function'?g.x(p):g.x,(L+W-R)/2,H-6);x.save();x.translate(11,(T+H-B)/2);x.rotate(-Math.PI/2);x.fillText(g.y,0,0);x.restore();
  const col=['#4c7dff','#ff7a4d','#36c98a'];
  ser.forEach((o,k)=>{x.strokeStyle=col[k];x.lineWidth=2.3;x.beginPath();xs.forEach((t,i)=>i?x.lineTo(X(t),Y(o.y[i])):x.moveTo(X(t),Y(o.y[i])));x.stroke();x.fillStyle=col[k];x.textAlign='left';x.fillText('— '+o.s.n,L+8+k*120,T-9)});
  if(g.m){const m=g.m(p);x.strokeStyle=cs('--ink');x.setLineDash([4,4]);x.globalAlpha=.6;x.beginPath();x.moveTo(X(m),T);x.lineTo(X(m),H-B);x.stroke();x.setLineDash([]);x.globalAlpha=1;ser.forEach((o,k)=>{x.fillStyle=col[k];x.beginPath();x.arc(X(m),Y(o.s.f(p,m)),4.5,0,7);x.fill()})}}
 const arw=(c,x0,y0,x1,y1,col)=>{c.strokeStyle=col;c.fillStyle=col;c.lineWidth=2.5;c.beginPath();c.moveTo(x0,y0);c.lineTo(x1,y1);c.stroke();const a=Math.atan2(y1-y0,x1-x0);c.beginPath();c.moveTo(x1,y1);c.lineTo(x1-9*Math.cos(a-.4),y1-9*Math.sin(a-.4));c.lineTo(x1-9*Math.cos(a+.4),y1-9*Math.sin(a+.4));c.fill()};
-const tau=p=>p.R*p.C*1e-3,phi=p=>Math.atan2(p.XL-p.XC,p.R);
+// símbolos de circuito (centrados en x,y, con 30 px de cable a cada lado)
+function sym(c,k,x,y,o,lab){c.save();c.translate(x,y);if(o==='v')c.rotate(Math.PI/2);c.strokeStyle=cs('--ink');c.fillStyle=cs('--ink');c.lineWidth=2.4;c.lineCap='round';c.lineJoin='round';c.beginPath();
+ if(k==='R'){c.moveTo(-30,0);c.lineTo(-20,0);for(let i=0;i<6;i++)c.lineTo(-20+(i+.5)*40/6,i%2?9:-9);c.lineTo(20,0);c.lineTo(30,0)}
+ if(k==='C'){c.moveTo(-30,0);c.lineTo(-5,0);c.moveTo(-5,-14);c.lineTo(-5,14);c.moveTo(5,-14);c.lineTo(5,14);c.moveTo(5,0);c.lineTo(30,0)}
+ if(k==='L'){c.moveTo(-30,0);c.lineTo(-20,0);for(let i=0;i<4;i++)c.arc(-15+10*i,0,5,Math.PI,0);c.lineTo(30,0)}
+ if(k==='B'){c.moveTo(-30,0);c.lineTo(-6,0);c.moveTo(-6,-15);c.lineTo(-6,15);c.moveTo(6,-8);c.lineTo(6,8);c.moveTo(6,0);c.lineTo(30,0)}
+ if(k==='A'){c.moveTo(-30,0);c.lineTo(-14,0);c.moveTo(14,0);c.lineTo(30,0);c.moveTo(14,0);c.arc(0,0,14,0,7);c.moveTo(-8,0);c.bezierCurveTo(-4,-10,-1,-10,0,0);c.bezierCurveTo(1,10,4,10,8,0)}
+ c.stroke();if(k==='B'){c.lineWidth=5;c.beginPath();c.moveTo(6,-8);c.lineTo(6,8);c.stroke()}c.restore();
+ const lf=x<c.canvas.width/2;c.fillStyle=cs('--ink');c.font='600 12.5px system-ui';c.textAlign=o==='v'?(lf?'left':'right'):'center';c.fillText(lab,o==='v'?x+(lf?24:-24):x,o==='v'?y+4:y-20);
+ if(k==='B'){c.font='bold 13px system-ui';c.fillText('+',o==='v'?x+8:x-12,o==='v'?y-24:y-8)}}
+function ed(c,x1,y1,x2,y2,k,lab){const h=y1===y2,mx=(x1+x2)/2,my=(y1+y2)/2;c.strokeStyle=cs('--ink');c.lineWidth=2.4;c.lineCap='round';
+ if(!k){c.beginPath();c.moveTo(x1,y1);c.lineTo(x2,y2);c.stroke();return}
+ const d=h?Math.sign(x2-x1):Math.sign(y2-y1);c.beginPath();c.moveTo(x1,y1);c.lineTo(h?mx-30*d:x1,h?y1:my-30*d);c.moveTo(h?mx+30*d:x1,h?y1:my+30*d);c.lineTo(x2,y2);c.stroke();sym(c,k,mx,my,h?'h':'v',lab)}
+function flow(c,pts,sp,t,n){let L=0;const seg=[];for(let i=0;i<pts.length;i++){const a=pts[i],b=pts[(i+1)%pts.length],l=Math.hypot(b[0]-a[0],b[1]-a[1]);seg.push([a,b,l]);L+=l}
+ c.fillStyle='#ffc43d';for(let k=0;k<n;k++){let d=(((k/n)+sp(t))%1+1)%1*L;for(const [a,b,l] of seg){if(d<=l){c.beginPath();c.arc(a[0]+(b[0]-a[0])*d/l,a[1]+(b[1]-a[1])*d/l,3.6,0,7);c.fill();break}d-=l}}}
+const fz2=n=>n>=1e3?[1e-3,'kΩ']:[1,'Ω'],tau=p=>p.R*p.C*1e-3,tu=p=>tau(p)<1e-3?[1e6,'µs']:tau(p)<1?[1e3,'ms']:[1,'s'],tf=p=>p.dt<1?[1e3,'ms']:[1,'s'],phi=p=>Math.atan2(p.XL-p.XC,p.R),f0=p=>p.XL>0&&p.XC>0?p.f*Math.sqrt(p.XC/p.XL):0;
 function dip(p,px,py,mx,my){const a=p.a*Math.PI/180,dx=px-mx,dy=py-my,ca=Math.cos(-a),sa=Math.sin(-a),lx=dx*ca-dy*sa,ly=dx*sa+dy*ca,r=Math.max(Math.hypot(lx,ly),30),ux=lx/r,uy=ly/r,k=p.S/100*8/Math.pow(r/100,3),bx=(3*ux*ux-1)*k,by=3*ux*uy*k,c=Math.cos(a),s=Math.sin(a),X=bx*c-by*s,Y=bx*s+by*c;return {m:Math.hypot(X,Y),g:Math.atan2(Y,X),r}}
+const loop=(w,h)=>{const x0=80,x1=w-80,y0=40,y1=h-40;return {x0,x1,y0,y1,pts:[[x0,y0],[x1,y0],[x1,y1],[x0,y1]]}};
 const LABS={
+dc:{n:'Circuito de resistencias',sim:'circuit-construction-kit-dc',anim:1,vh:230,P:[['V','V (V)',1,48,.5,12],['R1','R₁ (Ω)',1,100,1,4],['R2','R₂ (Ω)',1,100,1,6],['m','Paralelo 1 / Serie 0',0,1,1,1]],
+ K:p=>{const par=p.m>=.5,Re=par?p.R1*p.R2/(p.R1+p.R2):p.R1+p.R2,I=p.V/Re;return {par,Re,I}},
+ R:function(p){const k=this.K(p);return k.par?[['R_eq',g3(k.Re)+' Ω'],['I total',g3(k.I)+' A'],['I₁',g3(p.V/p.R1)+' A'],['I₂',g3(p.V/p.R2)+' A'],['P',g3(p.V*k.I)+' W']]:[['R_eq',g3(k.Re)+' Ω'],['I',g3(k.I)+' A'],['V₁',g3(k.I*p.R1)+' V'],['V₂',g3(k.I*p.R2)+' V'],['P',g3(p.V*k.I)+' W']]},
+ V:function(c,p,w,h,t){const q=loop(w,h),k=this.K(p);
+  if(!k.par){ed(c,q.x0,q.y1,q.x0,q.y0,'B',p.V+' V');ed(c,q.x0,q.y0,q.x1,q.y0,'R','R₁ = '+p.R1+' Ω');ed(c,q.x1,q.y0,q.x1,q.y1,'R','R₂ = '+p.R2+' Ω');ed(c,q.x1,q.y1,q.x0,q.y1)}
+  else{const xm=(q.x0+q.x1)/2;ed(c,q.x0,q.y1,q.x0,q.y0,'B',p.V+' V');ed(c,q.x0,q.y0,xm,q.y0);ed(c,xm,q.y0,q.x1,q.y0);ed(c,xm,q.y0,xm,q.y1,'R','R₁ = '+p.R1+' Ω');ed(c,q.x1,q.y0,q.x1,q.y1,'R','R₂ = '+p.R2+' Ω');ed(c,q.x1,q.y1,q.x0,q.y1);
+   c.fillStyle=cs('--ink');[xm,q.x1].forEach(x=>{[q.y0,q.y1].forEach(y=>{c.beginPath();c.arc(x,y,3.5,0,7);c.fill()})})}
+  flow(c,q.pts,t=>(t||0)*(.0016+.004*Math.min(1,k.I/8)),t,12)}},
+rc:{n:'Circuito RC',sim:'circuit-construction-kit-dc-virtual-lab',anim:1,vh:230,P:[['R','R (kΩ)',.1,100,.1,10],['C','C (µF)',1,1000,1,100],['V','V (V)',1,24,.5,12],['tm','t (en τ)',0,5,.1,1]],
+ R:p=>[['τ = RC',g3(tau(p)*tu(p)[0])+' '+tu(p)[1]],['V_C(t)',g3(p.V*(1-Math.exp(-p.tm)))+' V'],['I(t)',g3(p.V/p.R*Math.exp(-p.tm))+' mA'],['Q final',g3(p.C*p.V)+' µC']],
+ V:(c,p,w,h,t)=>{const q=loop(w,h);ed(c,q.x0,q.y1,q.x0,q.y0,'B',p.V+' V');ed(c,q.x0,q.y0,q.x1,q.y0,'R','R = '+p.R+' kΩ');ed(c,q.x1,q.y0,q.x1,q.y1,'C','C = '+p.C+' µF');ed(c,q.x1,q.y1,q.x0,q.y1);
+  flow(c,q.pts,t=>(t||0)*(.0012+.0042*Math.exp(-p.tm)),t,12)},
+ G:[{k:'t',x:p=>'t ('+tu(p)[1]+')',y:'voltaje (V)',xr:p=>[0,5*tau(p)*tu(p)[0]],S:[{n:'V_C',f:(p,x)=>p.V*(1-Math.exp(-x/tu(p)[0]/tau(p)))},{n:'V_R',f:(p,x)=>p.V*Math.exp(-x/tu(p)[0]/tau(p))}],m:p=>p.tm*tau(p)*tu(p)[0]}]},
+rlc:{n:'Circuito RLC en serie',sim:'circuit-construction-kit-ac',anim:1,vh:230,P:[['R','R (Ω)',1,200,1,30],['XL','X_L (Ω)',0,200,1,60],['XC','X_C (Ω)',0,200,1,20],['V','V RMS (V)',1,300,1,100],['f','f (Hz)',10,2000,1,60]],
+ R:p=>{const X=p.XL-p.XC,Z=Math.hypot(p.R,X),I=p.V/Z,r=[['Z',g3(Z)+' Ω'],['I',g3(I)+' A'],['φ',g3(phi(p)*180/Math.PI)+'°'],['f.p.',g3(p.R/Z)],['P',g3(I*I*p.R)+' W'],['Q',g3(I*I*X)+' var'],['S',g3(p.V*I)+' VA']];if(f0(p))r.push(['f₀',g3(f0(p))+' Hz']);return r},
+ V:(c,p,w,h,t)=>{const q=loop(w,h);ed(c,q.x0,q.y1,q.x0,q.y0,'A',p.V+' V · '+p.f+' Hz');ed(c,q.x0,q.y0,q.x1,q.y0,'R','R = '+p.R+' Ω');ed(c,q.x1,q.y0,q.x1,q.y1,'L','X_L = '+p.XL+' Ω');ed(c,q.x1,q.y1,q.x0,q.y1,'C','X_C = '+p.XC+' Ω');
+  flow(c,q.pts,t=>.03*Math.sin((t||0)*.07),t,12)},
+ G:[{k:'wave',x:'ciclos',y:'valor normalizado',xr:()=>[0,2],S:[{n:'v(t)',f:(p,x)=>Math.sin(2*Math.PI*x+phi(p))},{n:'i(t)',f:(p,x)=>Math.sin(2*Math.PI*x)}]},
+    {k:'f',x:'frecuencia (Hz)',y:'corriente I (A)',xr:p=>{const c=f0(p)||p.f;return [c/4,c*3]},S:[{n:'I(f)',f:(p,x)=>p.V/Math.hypot(p.R,p.XL*x/p.f-p.XC*p.f/x)}],m:p=>p.f}]},
 coulomb:{n:'Ley de Coulomb',sim:'coulombs-law',P:[['q1','q₁ (µC)',-20,20,.1,3],['q2','q₂ (µC)',-20,20,.1,-5],['r','r (cm)',5,100,1,20]],
  R:p=>[['Fuerza',g3(K9*Math.abs(p.q1*p.q2)*1e-12/(p.r/100)**2)+' N'],['Tipo',p.q1*p.q2<0?'atracción':p.q1*p.q2>0?'repulsión':'sin fuerza']],
- V:(c,p,w,h)=>{const sp=.2+.6*Math.min(1,p.r/100),x1=w*(.5-sp/2),x2=w*(.5+sp/2),y=h/2,at=p.q1*p.q2<0,d=at?1:-1;
+ V:(c,p,w,h)=>{const sp=.2+.6*Math.min(1,p.r/100),x1=w*(.5-sp/2),x2=w*(.5+sp/2),y=h/2,d=p.q1*p.q2<0?1:-1;
   [[x1,p.q1],[x2,p.q2]].forEach(([x,q],i)=>{c.fillStyle=q>=0?'#ff5a4d':'#4c7dff';c.beginPath();c.arc(x,y,12+Math.min(16,Math.abs(q)),0,7);c.fill();c.fillStyle='#fff';c.font='bold 18px system-ui';c.textAlign='center';c.fillText(q>=0?'+':'−',x,y+6);
-   const s=i?-d:d;arw(c,x+s*(30+Math.min(16,Math.abs(q))),y-34,x+s*(30+Math.min(16,Math.abs(q)))+s*44,y-34,cs('--ink'))});
-  c.fillStyle=cs('--mut');c.font='12px system-ui';c.fillText('r = '+p.r+' cm',w/2,y+52)},vh:170,
- G:[{x:'r (cm)',y:'F (N)',xr:()=>[5,100],S:[{n:'F(r)',f:(p,x)=>K9*Math.abs(p.q1*p.q2)*1e-12/(x/100)**2}],m:p=>p.r}]},
-rc:{n:'Circuito RC',sim:'circuit-construction-kit-ac',P:[['R','R (kΩ)',.1,100,.1,10],['C','C (µF)',1,1000,1,100],['V','V (V)',1,24,.5,12],['tm','t (en τ)',0,5,.1,1]],
- R:p=>[['τ',g3(tau(p))+' s'],['V_C(t)',g3(p.V*(1-Math.exp(-p.tm)))+' V'],['I(t)',g3(p.V/p.R*Math.exp(-p.tm))+' mA'],['Carga final',g3(p.C*p.V)+' µC']],
- G:[{x:'t (s)',y:'voltaje (V)',xr:p=>[0,5*tau(p)],S:[{n:'V_C',f:(p,x)=>p.V*(1-Math.exp(-x/tau(p)))},{n:'V_R',f:(p,x)=>p.V*Math.exp(-x/tau(p))}],m:p=>p.tm*tau(p)}]},
-faraday:{n:'Ley de Faraday',sim:'faradays-law',P:[['N','N (espiras)',1,1000,1,200],['A','A (cm²)',1,500,1,100],['B0','B inicial (T)',0,2,.05,0],['B1','B final (T)',0,2,.05,.5],['dt','Δt (s)',.01,2,.01,.1]],
+   const s=i?-d:d,o=30+Math.min(16,Math.abs(q));arw(c,x+s*o,y-34,x+s*o+s*44,y-34,cs('--ink'))});c.fillStyle=cs('--mut');c.font='12px system-ui';c.textAlign='center';c.fillText('r = '+p.r+' cm',w/2,y+52)},vh:170,
+ G:[{k:'r',x:'r (cm)',y:'F (N)',xr:()=>[5,100],S:[{n:'F(r)',f:(p,x)=>K9*Math.abs(p.q1*p.q2)*1e-12/(x/100)**2}],m:p=>p.r}]},
+faraday:{n:'Ley de Faraday',sim:'faradays-law',vh:190,P:[['N','N (espiras)',1,1000,1,200],['A','A (cm²)',1,500,1,100],['B0','B inicial (T)',0,2,.05,0],['B1','B final (T)',0,2,.05,.5],['dt','Δt (s)',.01,2,.01,.1]],
  R:p=>[['|ε|',g3(Math.abs(p.N*p.A*1e-4*(p.B1-p.B0)/p.dt))+' V'],['ΔΦ',g3(p.A*1e-4*(p.B1-p.B0)*1e3)+' mWb'],['Lenz',p.B1>p.B0?'se opone al aumento':p.B1<p.B0?'se opone a la disminución':'sin cambio']],
- G:[{x:'t (s)',y:'flujo Φ (mWb)',xr:p=>[0,2*p.dt],S:[{n:'Φ(t)',f:(p,x)=>(x<p.dt?p.B0+(p.B1-p.B0)*x/p.dt:p.B1)*p.A*1e-4*1e3}]},
-    {x:'t (s)',y:'fem ε (V)',xr:p=>[0,2*p.dt],S:[{n:'ε(t)',f:(p,x)=>x<p.dt?-p.N*p.A*1e-4*(p.B1-p.B0)/p.dt:0}]}]},
-rlc:{n:'Circuito RLC en serie',sim:'circuit-construction-kit-ac',P:[['R','R (Ω)',1,200,1,30],['XL','X_L (Ω)',0,200,1,60],['XC','X_C (Ω)',0,200,1,20],['V','V RMS (V)',1,300,1,100]],
- R:p=>{const X=p.XL-p.XC,Z=Math.hypot(p.R,X),I=p.V/Z;return [['Z',g3(Z)+' Ω'],['I',g3(I)+' A'],['φ',g3(phi(p)*180/Math.PI)+'°'],['f.p.',g3(p.R/Z)],['P',g3(I*I*p.R)+' W'],['Q',g3(I*I*X)+' var'],['S',g3(p.V*I)+' VA']]},
- V:(c,p,w,h)=>{const X=p.XL-p.XC,s=Math.min((w-120)/(p.R+1),(h-60)/(Math.abs(X)+1)),x0=60,y0=h/2+(X>0?(Math.abs(X)*s)/2:-(Math.abs(X)*s)/2),x1=x0+p.R*s,y1=y0-X*s;
-  arw(c,x0,y0,x1,y0,'#36c98a');arw(c,x1,y0,x1,y1,'#ff7a4d');arw(c,x0,y0,x1,y1,'#4c7dff');c.font='12px system-ui';c.fillStyle=cs('--ink');c.textAlign='center';c.fillText('R',(x0+x1)/2,y0+16);c.textAlign='left';c.fillText('X',x1+6,(y0+y1)/2);c.fillText('Z',(x0+x1)/2-16,(y0+y1)/2-6)},vh:190,
- G:[{x:'ciclos',y:'valor normalizado',xr:()=>[0,2],S:[{n:'v(t)',f:(p,x)=>Math.sin(2*Math.PI*x+phi(p))},{n:'i(t)',f:(p,x)=>Math.sin(2*Math.PI*x)}]}]},
+ V:(c,p,w,h)=>{const cy=h/2;c.fillStyle='#ff5a4d';c.fillRect(70,cy-20,60,40);c.fillStyle='#4c7dff';c.fillRect(10,cy-20,60,40);c.fillStyle='#fff';c.font='bold 16px system-ui';c.textAlign='center';c.fillText('S',40,cy+6);c.fillText('N',100,cy+6);
+  arw(c,140,cy,210,cy,'#36c98a');c.strokeStyle=cs('--ink');c.lineWidth=2.6;for(let i=0;i<6;i++){c.beginPath();c.ellipse(260+i*18,cy,16,46,0,0,7);c.stroke()}
+  c.fillStyle=cs('--ink');c.font='12.5px system-ui';c.textAlign='left';c.fillText('N = '+p.N+' espiras · A = '+p.A+' cm²',w-250,cy-62);c.fillText('B: '+p.B0+' → '+p.B1+' T en '+p.dt+' s',w-250,cy+72)},
+ G:[{k:'t',x:p=>'t ('+tf(p)[1]+')',y:'flujo Φ (mWb)',xr:p=>[0,2*p.dt*tf(p)[0]],S:[{n:'Φ(t)',f:(p,x)=>{x/=tf(p)[0];return (x<p.dt?p.B0+(p.B1-p.B0)*x/p.dt:p.B1)*p.A*1e-1}}]},
+    {k:'t',x:p=>'t ('+tf(p)[1]+')',y:'fem ε (V)',xr:p=>[0,2*p.dt*tf(p)[0]],S:[{n:'ε(t)',f:(p,x)=>x/tf(p)[0]<p.dt?-p.N*p.A*1e-4*(p.B1-p.B0)/p.dt:0}]}]},
 lorentz:{n:'Carga en un campo magnético',sim:'magnets-and-electromagnets',P:[['q','q (µC)',-50,50,.1,2],['m','m (mg)',.001,10,.001,1],['v','v (m/s)',1,1e6,1,3e5],['B','B (T)',.01,2,.01,.4]],
  R:p=>{const q=Math.abs(p.q)||1e-9;return [['F = |q|vB',g3(q*1e-6*p.v*p.B)+' N'],['Radio',g3(p.m*p.v/(q*p.B))+' m'],['Periodo',g3(2*Math.PI*p.m/(q*p.B))+' s'],['Sentido',p.q>0?'antihorario':'horario']]},
- V:(c,p,w,h)=>{const R=h*.36,cx=w/2,cy=h/2;c.strokeStyle=cs('--mut');c.globalAlpha=.7;c.font='15px system-ui';c.fillStyle=cs('--mut');c.textAlign='center';
+ V:(c,p,w,h)=>{const R=h*.36,cx=w/2,cy=h/2;c.globalAlpha=.7;c.font='15px system-ui';c.fillStyle=cs('--mut');c.textAlign='center';
   for(let i=0;i<8;i++)for(let j=0;j<4;j++)c.fillText('×',20+i*(w-40)/7,28+j*(h-50)/3);c.globalAlpha=1;
   c.strokeStyle='#4c7dff';c.lineWidth=2.5;c.beginPath();c.arc(cx,cy,R,0,7);c.stroke();const px=cx+R,py=cy;c.fillStyle=p.q>=0?'#ff5a4d':'#4c7dff';c.beginPath();c.arc(px,py,8,0,7);c.fill();
   arw(c,px,py,px,py-(p.q>=0?1:-1)*48,'#36c98a');arw(c,px,py,px-46,py,'#ff7a4d');c.fillStyle=cs('--ink');c.font='12px system-ui';c.textAlign='left';c.fillText('v',px+10,py-(p.q>=0?1:-1)*40);c.fillText('F',px-40,py+16)},vh:210},
 magnet:{n:'Imán de barra y brújula',sim:'magnet-and-compass',P:[['S','Intensidad (%)',0,100,1,60],['a','Giro (°)',-180,180,1,0],['cx','Brújula x (%)',5,95,1,75],['cy','Brújula y (%)',5,95,1,30]],
  R:p=>{const d=dip(p,p.cx/100*560,p.cy/100*230,280,115);return [['B',g3(d.m)+' G'],['Aguja',g3(-d.g*180/Math.PI)+'°'],['Distancia',Math.round(d.r)+' px']]},
- V:(c,p,w,h)=>{const mx=w/2,my=h/2,a=p.a*Math.PI/180,ca=Math.cos(-a),sa=Math.sin(-a);c.lineCap='round';c.lineWidth=1.3;
+ V:(c,p,w,h)=>{const mx=w/2,my=h/2,a=p.a*Math.PI/180;c.lineCap='round';c.lineWidth=1.3;
   for(let y=14;y<h;y+=22)for(let x=14;x<w;x+=22){const d=dip(p,x,y,mx,my),st=Math.min(1,d.m/6),L=(5+8*st)/2,ox=Math.cos(d.g)*L,oy=Math.sin(d.g)*L;c.strokeStyle='rgba('+(cs('--fil')||'100,110,150')+','+(.2+.6*st)+')';c.beginPath();c.moveTo(x-ox,y-oy);c.lineTo(x+ox,y+oy);c.stroke()}
   c.save();c.translate(mx,my);c.rotate(a);c.fillStyle='#ff5a4d';c.fillRect(0,-16,50,32);c.fillStyle='#4c7dff';c.fillRect(-50,-16,50,32);c.fillStyle='#fff';c.font='bold 15px system-ui';c.textAlign='center';c.fillText('S',-25,5);c.fillText('N',25,5);c.restore();
   const qx=p.cx/100*w,qy=p.cy/100*h,d=dip(p,qx,qy,mx,my);c.save();c.translate(qx,qy);c.fillStyle=cs('--surf');c.strokeStyle=cs('--mut');c.lineWidth=2;c.beginPath();c.arc(0,0,22,0,7);c.fill();c.stroke();c.rotate(d.g);c.fillStyle='#ff5a4d';c.beginPath();c.moveTo(18,0);c.lineTo(0,-5);c.lineTo(0,5);c.fill();c.fillStyle='#8a94a6';c.beginPath();c.moveTo(-18,0);c.lineTo(0,-5);c.lineTo(0,5);c.fill();c.restore()},vh:230,
- G:[{x:'distancia al imán (px)',y:'B (G)',xr:()=>[40,300],S:[{n:'B en el eje',f:(p,x)=>p.S/100*16/Math.pow(x/100,3)*1}],m:p=>dip(p,p.cx/100*560,p.cy/100*230,280,115).r}]}};
+ G:[{k:'d',x:'distancia al imán (px)',y:'B (G)',xr:()=>[40,300],S:[{n:'B en el eje',f:(p,x)=>p.S/100*16/Math.pow(x/100,3)}],m:p=>dip(p,p.cx/100*560,p.cy/100*230,280,115).r}]}};
 function mkLab(js){let sp;try{sp=JSON.parse(js)}catch(e){return null}const L=LABS[sp.t];if(!L)return null;
  const p={},root=document.createElement('div');root.className='lab2';root.innerHTML='<h4>Laboratorio: '+L.n+'</h4>';
  let cv0=null;if(L.V){cv0=document.createElement('canvas');cv0.width=560;cv0.height=L.vh||190;root.appendChild(cv0)}
- const gc=(L.G||[]).map(()=>{const c=document.createElement('canvas');c.width=560;c.height=210;root.appendChild(c);return c});
- const ro=document.createElement('div');ro.className='ro';root.appendChild(ro);const sl=document.createElement('div');sl.className='sls';root.appendChild(sl);
- function upd(){ro.innerHTML=L.R(p).map(([a,b])=>'<span>'+a+': <b>'+b+'</b></span>').join('');if(cv0){const c=cv0.getContext('2d');c.clearRect(0,0,cv0.width,cv0.height);L.V(c,p,cv0.width,cv0.height)}(L.G||[]).forEach((g,i)=>gph(gc[i],g,p))}
+ const want=[].concat(sp.g||[]),GL=(L.G||[]).filter(g=>want.includes(g.k)),gc=GL.map(()=>{const c=document.createElement('canvas');c.width=560;c.height=210;root.appendChild(c);return c});
+ const ro=document.createElement('div');ro.className='ro';root.appendChild(ro);const sl=document.createElement('div');sl.className='sls';root.appendChild(sl);let tt=0;
+ const vis=()=>{if(cv0){const c=cv0.getContext('2d');c.clearRect(0,0,cv0.width,cv0.height);L.V(c,p,cv0.width,cv0.height,tt)}};
+ function upd(){ro.innerHTML=L.R(p).map(([a,b])=>'<span>'+a+': <b>'+b+'</b></span>').join('');vis();GL.forEach((g,i)=>gph(gc[i],g,p))}
  L.P.forEach(([k,l,lo,hi,st,d])=>{let v=sp[k];v=(typeof v==='number'&&isFinite(v))?v:d;p[k]=v;const mn=Math.min(lo,v),mx=Math.max(hi,v),r=document.createElement('label');r.className='sl';
   r.innerHTML='<span>'+l+'</span><input type="range" min="'+mn+'" max="'+mx+'" step="'+st+'" value="'+v+'"><b>'+g3(v)+'</b>';
   r.querySelector('input').oninput=e=>{p[k]=+e.target.value;r.querySelector('b').textContent=g3(p[k]);upd()};sl.appendChild(r)});
- upd();const sim=SIMS.find(x=>x.s===L.sim);if(sim){const b=document.createElement('button');b.type='button';b.className='pill';b.textContent='Abrir también en la simulación de PhET';b.onclick=()=>openSim(sim);root.appendChild(b)}
+ upd();
+ if(L.anim&&!matchMedia('(prefers-reduced-motion: reduce)').matches){let n=0;const go=()=>{if(!cv0.isConnected&&++n>40)return;tt++;vis();requestAnimationFrame(go)};requestAnimationFrame(go)}
+ const sim=SIMS.find(x=>x.s===L.sim);if(sim){const b=document.createElement('button');b.type='button';b.className='pill';b.textContent='Abrir también en la simulación de PhET';b.onclick=()=>openSim(sim);root.appendChild(b)}
  return root}
 const FL='<svg class="fl" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3h4M9 3v5l-4 7a1.5 1.5 0 0 0 1.3 2.2h7.4A1.5 1.5 0 0 0 15 15l-4-7V3"/></svg>';
 document.querySelectorAll('.tc').forEach(b=>{if(SIMS.some(x=>x.t.some(i=>TOPICS[i]===b.dataset.t)))b.insertAdjacentHTML('beforeend',FL)});
