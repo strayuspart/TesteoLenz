@@ -3,37 +3,219 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Lenz · Estación de Física Aplicada</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20120%20120%22%20role%3D%22img%22%20aria-label%3D%22Lenz%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22%234c7dff%22/%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%238f73ff%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width%3D%22120%22%20height%3D%22120%22%20rx%3D%2230%22%20fill%3D%22url%28%23g%29%22/%3E%3Cg%20transform%3D%22translate%2816%2011%29%20scale%28.9%29%22%3E%3Cg%20fill%3D%22%23ffffff%22%20stroke%3D%22%23ffffff%22%20stroke-linecap%3D%22round%22%3E%0A%3Ccircle%20cx%3D%2225%22%20cy%3D%2223%22%20r%3D%2214.5%22%20stroke%3D%22none%22/%3E%0A%3Ccircle%20cx%3D%2273%22%20cy%3D%2253%22%20r%3D%2212.5%22%20stroke%3D%22none%22/%3E%0A%3Ccircle%20cx%3D%2237%22%20cy%3D%2285%22%20r%3D%2210%22%20stroke%3D%22none%22/%3E%0A%3Cpath%20d%3D%22M25%2023L73%2053%22%20stroke-width%3D%2211%22/%3E%0A%3Cpath%20d%3D%22M73%2053L37%2085%22%20stroke-width%3D%228.5%22/%3E%0A%3C/g%3E%3C/g%3E%3C/svg%3E">
-<script>try{var t=localStorage.getItem("lenz.theme");if(t)document.documentElement.dataset.theme=t}catch(e){}</script>
+<title>Lenz · Tutor de física</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
 <style>
-:root{--bg:#e8eefc;--bgg:radial-gradient(900px 600px at 85% -10%,#b9ccff,transparent 60%),radial-gradient(800px 600px at 0% 105%,#d9c9ff,transparent 60%);--surf:rgba(255,255,255,.76);--ink:#10172b;--mut:#55617e;--line:rgba(60,80,160,.2);--acc:#4c7dff;--fil:30,40,90;--r:16px;--sans:"Instrument Sans",system-ui,-apple-system,"Segoe UI",sans-serif;--disp:"Bricolage Grotesque","Instrument Sans",system-ui,sans-serif;--mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#060b1f;--bgg:radial-gradient(1100px 700px at 80% -10%,rgba(40,80,200,.45),transparent 60%),radial-gradient(900px 600px at 0% 105%,rgba(90,50,200,.3),transparent 60%);--surf:rgba(14,22,52,.72);--ink:#e9eefc;--mut:#9aa7c7;--line:rgba(120,150,255,.22);--fil:170,190,255;color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#060b1f;--bgg:radial-gradient(1100px 700px at 80% -10%,rgba(40,80,200,.45),transparent 60%),radial-gradient(900px 600px at 0% 105%,rgba(90,50,200,.3),transparent 60%);--surf:rgba(14,22,52,.72);--ink:#e9eefc;--mut:#9aa7c7;--line:rgba(120,150,255,.22);--fil:170,190,255;color-scheme:dark}
+:root{--bg:#e9edf3;--panel:rgba(246,248,252,.9);--ink:#141a26;--mut:#5a667a;--line:#c7cfdc;--acc:#3b6fe0;--fil:20,26,38;--sans:"Instrument Sans",system-ui,-apple-system,"Segoe UI",sans-serif;--disp:"Bricolage Grotesque","Instrument Sans",system-ui,sans-serif}
+@media (prefers-color-scheme:dark){:root{--bg:#0f1527;--panel:rgba(16,23,42,.88);--ink:#e7ecf6;--mut:#97a3ba;--line:#2a3550;--fil:200,212,240;color-scheme:dark}}
 *{box-sizing:border-box}html,body{height:100%}
-body{margin:0;background:var(--bgg),var(--bg);background-attachment:fixed;color:var(--ink);font:15.5px/1.6 var(--sans);padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0)}
-button,a{font:inherit}button:focus-visible,textarea:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
-svg{display:block}[hidden]{display:none!important}
-#bg{position:fixed;inset:0;width:100%;height:100%;z-index:0;opacity:.5}
-#app{--sw:300px;--dw:0px;position:relative;z-index:1;display:grid;grid-template-columns:var(--sw) minmax(0,1fr) var(--dw);height:100%;gap:0;transition:grid-template-columns .4s cubic-bezier(.2,.8,.2,1)}
-.collapsed #app{--sw:0px}.simopen #app{--dw:min(46vw,680px)}
-aside,#sim{background:var(--surf);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);overflow:hidden;min-width:0}
-aside{border-right:1px solid var(--line)}#sim{border-left:1px solid var(--line);display:flex;flex-direction:column}
-.si{width:300px;height:100%;overflow-y:auto;padding:18px 14px;display:flex;flex-direction:column;gap:12px}
-.sb,.pill{font-size:13.5px;padding:8px 12px;border:1px solid var(--line);background:rgba(127,140,200,.08);color:var(--ink);cursor:pointer;border-radius:12px;text-decoration:none;transition:border-color .2s,background .2s;white-space:nowrap}
-.sb:hover,.pill:hover{border-color:var(--acc);background:rgba(127,140,200,.16)}
-.t{display:block;width:100%;font-size:13.5px;text-align:left;padding:7px 10px 7px 12px;border:0;border-left:2px solid var(--c,var(--line));background:transparent;color:var(--ink);cursor:pointer;border-radius:0 10px 10px 0;transition:background .2s,padding .2s}
-.t:hover{background:rgba(127,140,200,.14);padding-left:16px}.t.on{background:color-mix(in srgb,var(--c) 22%,transparent);box-shadow:inset 3px 0 var(--c);font-weight:600}
-main{position:relative;display:flex;flex-direction:column;min-height:0;min-width:0}
-.top{display:flex;align-items:center;gap:10px;padding:10px 16px}
-.ic{width:38px;height:38px;display:grid;place-items:center;border:1px solid var(--line);background:var(--surf);backdrop-filter:blur(12px);color:var(--ink);border-radius:12px;cursor:pointer;flex:none}
-.ic:hover{border-color:var(--acc)}.ic svg{width:18px;height:18px}
-.crumb{display:flex;gap:8px;align-items:center;min-width:0;font-size:13.5px;color:var(--mut);white-space:nowrap;overflow:hidden}
-.crumb b{color:var(--ink);font-weight:600;overflow:hidden;text-overflow:ellipsis}.sep{opacity:.5}.sp{flex:1}
-#log,#lab{flex:1;overflow-y:auto;scroll-behavior:smooth}
-[data-view="chat"] #lab,[data-view="lab"] #log,[data-view="lab"] footer,[data-view="lab"] .down{display:none}
-.w{max-width:860px;margin:0 auto;padding:14px 24px 20px;display:flex;flex-direction:column;gap:16px;min-height:100%}
-.m{overflow-wrap:anywhere;max-width:100%}.mw{position:relative
+body{margin:0;background:var(--bg);color:var(--ink);font:15.5px/1.6 var(--sans);padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0)}
+button:focus-visible,textarea:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+#bg{position:fixed;inset:0;width:100%;height:100%;z-index:0}
+#app{position:relative;z-index:1;display:grid;grid-template-columns:284px 1fr;height:100%}
+aside{background:var(--panel);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-right:1px solid var(--line);padding:18px 14px;display:flex;flex-direction:column;gap:12px;overflow-y:auto}
+.brand{display:flex;align-items:center;gap:11px}.brand svg{width:36px;height:36px;flex:none}
+.brand b{font:700 26px/1 var(--disp);letter-spacing:-.03em}.brand small{display:block;color:var(--mut);font-size:12.5px;margin-top:3px}
+.sb{font:inherit;font-size:13.5px;text-align:left;padding:8px 10px;border:1px solid var(--line);background:transparent;color:var(--ink);cursor:pointer;border-radius:3px}
+.sb:hover{border-color:var(--acc)}
+nav .gl{font:600 12.5px var(--sans);color:var(--mut);margin:15px 0 4px}
+.t{display:block;width:100%;font:inherit;font-size:13.5px;text-align:left;padding:6px 8px 6px 10px;margin:0;border:0;border-left:3px solid var(--c,var(--line));background:transparent;color:var(--ink);cursor:pointer;transition:background .15s,padding .15s}
+.t:hover{background:rgba(127,127,127,.13);padding-left:15px}.t.on{background:var(--c);color:#fff}
+main{display:flex;flex-direction:column;min-height:0;min-width:0}
+header{display:none;align-items:center;gap:10px;padding:8px 12px;background:var(--panel);border-bottom:1px solid var(--line)}
+header b{font:700 20px var(--disp)}
+#log{flex:1;overflow-y:auto;scroll-behavior:smooth}
+.w{max-width:800px;margin:0 auto;padding:20px 24px;display:flex;flex-direction:column;gap:20px;min-height:100%}
+.w:not(:has(.hero)){background:var(--panel);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border-inline:1px solid var(--line)}
+.m{overflow-wrap:anywhere;max-width:100%}
+.u{align-self:flex-end;background:var(--acc);color:#fff;padding:9px 14px;border-radius:14px 14px 3px 14px;max-width:85%;white-space:pre-wrap}
+.b{border-left:3px solid var(--acc);padding:2px 0 2px 16px}
+.m p{margin:0 0 10px}.m p:last-child{margin:0}.m ul,.m ol{margin:0 0 10px;padding-left:22px}
+.m code{background:rgba(127,127,127,.2);padding:1px 5px;border-radius:3px;font-size:.9em}
+.m table{border-collapse:collapse;margin:8px 0;font-size:14px}.m td,.m th{border:1px solid var(--line);padding:5px 10px}
+.katex-display{overflow-x:auto;overflow-y:hidden;padding:3px 0}
+.fig{border:1px solid var(--line);margin:10px 0;padding:8px;background:rgba(127,127,127,.06)}.fig svg{width:100%;height:auto;max-height:360px}
+.cur::after{content:"▍";color:var(--acc);animation:bl 1s steps(2) infinite}@keyframes bl{50%{opacity:0}}
+.hero{margin:5vh 0 6px}
+.hero h2{font:700 clamp(32px,5.2vw,54px)/1.02 var(--disp);letter-spacing:-.035em;margin:0 0 16px;max-width:13ch}
+.hero p{max-width:48ch;color:var(--mut);margin:0 0 26px;font-size:17px}
+.ideas{display:flex;flex-direction:column;max-width:580px;background:var(--panel);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:1px solid var(--line)}
+.ideas button{font:inherit;text-align:left;padding:12px 14px;border:0;border-top:1px solid var(--line);border-left:4px solid var(--c);background:transparent;color:var(--ink);cursor:pointer;transition:padding .15s,background .15s}
+.ideas button:first-child{border-top:0}.ideas button:hover{padding-left:20px;background:rgba(127,127,127,.12)}
+footer{padding:0 16px 14px}
+.bar{max-width:800px;margin:0 auto;background:var(--panel);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid var(--line);padding:10px 12px}
+.modes{display:flex;gap:18px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
+.modes button{font:inherit;font-size:13.5px;padding:2px 0;border:0;border-bottom:2px solid transparent;background:transparent;color:var(--mut);cursor:pointer}
+.modes button.on{color:var(--ink);border-color:var(--acc)}
+.chip{font-size:12.5px;color:var(--mut)}.chip a{cursor:pointer;color:var(--acc);text-decoration:underline}
+form{display:flex;gap:8px;align-items:flex-end}
+textarea{flex:1;font:inherit;padding:9px 11px;border-radius:3px;border:1px solid var(--line);background:transparent;color:var(--ink);resize:none;min-width:0;max-height:150px}
+.ib{font:inherit;padding:9px 12px;border-radius:3px;border:1px solid var(--line);background:transparent;color:var(--ink);cursor:pointer}
+.go{background:var(--acc);border-color:var(--acc);color:#fff;font-weight:600}
+@media(max-width:800px){#app{grid-template-columns:1fr;grid-template-rows:auto 1fr}header{display:flex}
+aside{position:fixed;inset:0 20% 0 0;z-index:5;transform:translateX(-105%);transition:transform .25s;box-shadow:0 0 40px #0006}aside.open{transform:none}
+.w{padding:16px}.hero{margin-top:5vh}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<canvas id="bg" aria-hidden="true"></canvas>
+<div id="app">
+<aside id="side">
+  <div class="brand"><svg viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="9" fill="var(--acc)"/><g fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M12 28c0-12 16-12 16 0"/><path d="M7 28C7 9 33 9 33 28" opacity=".6"/></g><circle cx="12" cy="29" r="2.6" fill="#fff"/><circle cx="28" cy="29" r="2.6" fill="#fff" opacity=".55"/></svg><div><b>Lenz</b><small>Tutor de física aplicada</small></div></div>
+  <button class="sb" id="new">Nueva conversación</button>
+  <nav id="topics"></nav>
+  <button class="sb" id="dl">Descargar apuntes</button>
+</aside>
+<main>
+  <header><button class="ib" id="menu" aria-label="Temas">☰</button><b>Lenz</b></header>
+  <div id="log"><div class="w" id="w"></div></div>
+  <footer><div class="bar">
+    <div class="modes" id="modes">
+      <button data-m="explicar" class="on">Explicar</button>
+      <button data-m="resolver">Resolver paso a paso</button>
+      <button data-m="practicar">Practicar</button>
+      <button data-m="repaso">Repaso</button>
+      <span class="chip" id="chip"></span>
+    </div>
+    <div class="chip" id="pic" style="margin-bottom:4px"></div>
+    <form id="f">
+      <input type="file" id="file" accept="image/*" hidden>
+      <button type="button" class="ib" id="clip" title="Adjuntar foto de un problema">📎</button>
+      <textarea id="q" rows="1" placeholder="Escribe tu duda, pega un problema o adjunta una foto"></textarea>
+      <button class="ib go" id="send">Enviar</button>
+    </form>
+  </div></footer>
+</main>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<script>
+const NAME='Lenz';
+const TOPICS=['Carga y campo eléctrico','Energía y potencial eléctrico','Condensadores y capacitancia','Corriente, resistencia y ley de Ohm','Resistencias, potencia e instrumentos','Leyes de Kirchhoff','Circuitos RC (carga y descarga)','Campo y fuerza magnética','Biot-Savart y ley de Ampère','Ley de Faraday y ley de Lenz','Corriente alterna','Circuitos RLC','Modelos del diodo y rectificadores','Diodos y regulación Zener'];
+const IDEAS=['Explícame la ley de Faraday con un ejemplo cotidiano','Grafica la carga y descarga de un condensador RC','Resuelve: dos resistencias de 4 Ω y 6 Ω en paralelo a 12 V','Dame un problema de práctica sobre rectificadores','¿Cómo funciona un diodo Zener como regulador?','Diferencia entre potencia activa, reactiva y aparente'];
+const $=id=>document.getElementById(id),log=$('log'),W=$('w');
+let topic='',mode='explicar',busy=false,pic=null,chat=[];
+try{chat=JSON.parse(localStorage.getItem('lenz.chat')||'[]')}catch(e){}
+const save=()=>{try{localStorage.setItem('lenz.chat',JSON.stringify(chat.slice(-60)))}catch(e){}};
+const GROUPS=[['Electrostática','#e4572e',[0,1,2]],['Circuitos de corriente continua','#1f8a9e',[3,4,5,6]],['Magnetismo','#7a5cc2',[7,8,9]],['Corriente alterna','#3b6fe0',[10,11]],['Electrónica','#2fa866',[12,13]]];
+const nav=$('topics');
+const mk=(x,t,c)=>{const b=document.createElement('button');b.className='t';b.dataset.t=t;b.dataset.c=c;b.style.setProperty('--c',c);b.textContent=x;nav.appendChild(b);return b};
+mk('Todo el curso','','#3b6fe0').classList.add('on');
+GROUPS.forEach(([g,c,ix])=>{const l=document.createElement('div');l.className='gl';l.textContent=g;nav.appendChild(l);ix.forEach(i=>mk(TOPICS[i],TOPICS[i],c))});
+document.querySelectorAll('.t').forEach(b=>b.onclick=()=>{topic=b.dataset.t;document.querySelectorAll('.t').forEach(x=>x.classList.toggle('on',x===b));const c=b.dataset.c;document.documentElement.style.setProperty('--acc',c);window.lenzAcc&&window.lenzAcc(c);$('side').classList.remove('open')});
+$('modes').querySelectorAll('button').forEach(b=>b.onclick=()=>{mode=b.dataset.m;$('modes').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b))});
+$('menu').onclick=()=>$('side').classList.toggle('open');
+const esc=s=>s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+function plot(j){
+  let o;try{o=JSON.parse(j)}catch(e){return null}
+  const S=(o.series||[]).filter(s=>Array.isArray(s.x)&&Array.isArray(s.y)&&s.x.length>1);if(!S.length)return null;
+  const w=600,h=340,L=58,R=16,T=34,B=48,ns='http://www.w3.org/2000/svg',xs=S.flatMap(s=>s.x),ys=S.flatMap(s=>s.y);
+  const x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(0,...ys);let y1=Math.max(...ys);if(y1===y0)y1=y0+1;
+  const px=x=>L+(x-x0)/(x1-x0||1)*(w-L-R),py=y=>h-B-(y-y0)/(y1-y0)*(h-T-B);
+  const sv=document.createElementNS(ns,'svg');sv.setAttribute('viewBox',`0 0 ${w} ${h}`);
+  const a=(t,at,tx)=>{const e=document.createElementNS(ns,t);for(const k in at)e.setAttribute(k,at[k]);if(tx!=null)e.textContent=tx;sv.appendChild(e)};
+  const fm=v=>Math.abs(v)>=1e4||(Math.abs(v)<.01&&v!==0)?v.toExponential(1):+v.toPrecision(3);
+  for(let i=0;i<=5;i++){const xv=x0+(x1-x0)*i/5,yv=y0+(y1-y0)*i/5;
+    a('line',{x1:px(xv),x2:px(xv),y1:T,y2:h-B,stroke:'#8a94a6','stroke-opacity':.2});a('line',{x1:L,x2:w-R,y1:py(yv),y2:py(yv),stroke:'#8a94a6','stroke-opacity':.2});
+    a('text',{x:px(xv),y:h-B+16,'text-anchor':'middle','font-size':11,fill:'#8a94a6'},fm(xv));a('text',{x:L-6,y:py(yv)+4,'text-anchor':'end','font-size':11,fill:'#8a94a6'},fm(yv))}
+  a('rect',{x:L,y:T,width:w-L-R,height:h-T-B,fill:'none',stroke:'#8a94a6'});
+  const C=['#5b8cff','#ff6b5b','#35c47a','#f0a020'];
+  S.forEach((s,i)=>{a('polyline',{points:s.x.map((x,k)=>px(x)+','+py(s.y[k])).join(' '),fill:'none',stroke:C[i%4],'stroke-width':2.4});if(S.length>1)a('text',{x:L+8+i*130,y:T-10,'font-size':12,fill:C[i%4]},'— '+(s.name||''))});
+  a('text',{x:w/2,y:h-8,'text-anchor':'middle','font-size':12,fill:'#8a94a6'},o.xlabel||'');
+  a('text',{x:14,y:h/2,'text-anchor':'middle','font-size':12,fill:'#8a94a6',transform:`rotate(-90 14 ${h/2})`},o.ylabel||'');
+  if(o.title)a('text',{x:w/2,y:18,'text-anchor':'middle','font-size':13,'font-weight':600,fill:'#8a94a6'},o.title);
+  return sv;
+}
+function seg(el,s){
+  const mt=[];s=s.replace(/\$\$[\s\S]+?\$\$|\$[^$\n]+?\$|\\\[[\s\S]+?\\\]|\\\([\s\S]+?\\\)/g,m=>{mt.push(m);return '@@M'+(mt.length-1)+'@@'});
+  let h=DOMPurify.sanitize(marked.parse(s,{breaks:true}));
+  h=h.replace(/@@M(\d+)@@/g,(_,i)=>esc(mt[i]));
+  const d=document.createElement('div');d.innerHTML=h;el.appendChild(d);
+  try{renderMathInElement(d,{delimiters:[{left:'$$',right:'$$',display:true},{left:'\\[',right:'\\]',display:true},{left:'$',right:'$',display:false},{left:'\\(',right:'\\)',display:false}],throwOnError:false})}catch(e){}
+}
+function show(el,text,live){
+  el.textContent='';const re=/```(plot|svg)[^\n]*\n([\s\S]*?)```/g;let last=0,m;
+  while((m=re.exec(text))){seg(el,text.slice(last,m.index));
+    let n=null;if(m[1]==='plot')n=plot(m[2]);else{const c=DOMPurify.sanitize(m[2],{USE_PROFILES:{svg:true,svgFilters:true}});const t=document.createElement('div');t.innerHTML=c;n=t.firstElementChild}
+    if(n){const f=document.createElement('div');f.className='fig';f.appendChild(n);el.appendChild(f)}last=re.lastIndex}
+  let rest=text.slice(last);const o=rest.indexOf('```');if(o>=0)rest=rest.slice(0,o)+'\n\n*Dibujando…*';
+  seg(el,rest);if(live)el.classList.add('cur');else el.classList.remove('cur');
+}
+const near=()=>log.scrollHeight-log.scrollTop-log.clientHeight<140;
+function add(t,c,live){const d=document.createElement('div');d.className='m '+c;if(c==='u')d.textContent=t;else show(d,t,live);W.appendChild(d);log.scrollTop=log.scrollHeight;return d}
+function hero(){
+  W.innerHTML='<div class="hero"><h2>¿Qué tema se te atascó hoy?</h2><p>Explico desde la intuición, resuelvo paso a paso, grafico y te pongo a practicar. Elige un tema en el menú o empieza con una de estas:</p><div class="ideas" id="ideas"></div></div>';
+  const C=['#7a5cc2','#1f8a9e','#1f8a9e','#2fa866','#2fa866','#3b6fe0'];
+  IDEAS.forEach((t,i)=>{const b=document.createElement('button');b.textContent=t;b.style.setProperty('--c',C[i]);b.onclick=()=>ask(t);$('ideas').appendChild(b)});
+}
+function render(){W.innerHTML='';if(!chat.length)return hero();chat.forEach(m=>add(m.content,m.role==='user'?'u':'b'))}
+async function toB64(file){
+  const bmp=await createImageBitmap(file),s=Math.min(1,1400/Math.max(bmp.width,bmp.height));
+  const c=document.createElement('canvas');c.width=bmp.width*s;c.height=bmp.height*s;c.getContext('2d').drawImage(bmp,0,0,c.width,c.height);
+  return c.toDataURL('image/jpeg',.85).split(',')[1];
+}
+$('clip').onclick=()=>$('file').click();
+$('file').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{pic={type:'image/jpeg',data:await toB64(f)};$('pic').innerHTML='📎 '+esc(f.name)+' <a id="rm">quitar</a>';$('rm').onclick=()=>{pic=null;$('pic').textContent='';$('file').value=''}}catch(x){pic=null}};
+async function ask(text){
+  text=(text||'').trim();if(busy||(!text&&!pic))return;if(!text)text='Resuelve el problema de la imagen.';
+  busy=true;if(!chat.length)W.innerHTML='';
+  add(text+(pic?'  📎':''),'u');const out=add('','b',true);
+  const img=pic;pic=null;$('pic').textContent='';$('file').value='';
+  const msgs=chat.map(m=>({role:m.role,content:m.content})).concat([{role:'user',content:text,image:img||undefined}]);
+  let acc='',raf=0;
+  try{
+    const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json','x-code':localStorage.getItem('lenz.code')||''},body:JSON.stringify({messages:msgs,mode,topic})});
+    if(r.status===401){const c=prompt('Código de acceso:');if(c)localStorage.setItem('lenz.code',c);throw new Error('Escribe de nuevo tu pregunta con el código.')}
+    if(!r.ok){let m='No pude responder.';try{m=(await r.json()).error||m}catch(e){}throw new Error(m)}
+    const rd=r.body.getReader(),dc=new TextDecoder();
+    for(;;){const{done,value}=await rd.read();if(done)break;acc+=dc.decode(value,{stream:true});
+      if(!raf)raf=requestAnimationFrame(()=>{raf=0;const n=near();show(out,acc,true);if(n)log.scrollTop=log.scrollHeight})}
+    cancelAnimationFrame(raf);show(out,acc,false);
+    chat.push({role:'user',content:text},{role:'assistant',content:acc});save();
+  }catch(e){out.classList.remove('cur');out.textContent=e.message||'No pude responder. Intenta de nuevo.'}
+  busy=false;
+}
+$('f').onsubmit=e=>{e.preventDefault();const v=$('q').value;$('q').value='';$('q').style.height='';ask(v)};
+$('q').onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();$('f').requestSubmit()}};
+$('q').oninput=e=>{e.target.style.height='auto';e.target.style.height=Math.min(e.target.scrollHeight,150)+'px'};
+$('new').onclick=()=>{if(busy)return;chat=[];save();render();$('side').classList.remove('open')};
+$('dl').onclick=()=>{const t=chat.map(m=>(m.role==='user'?'## Pregunta\n':'## '+NAME+'\n')+m.content).join('\n\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:'text/markdown'}));a.download='apuntes-lenz.md';a.click()};
+render();
+</script>
+<script>
+// Fondo: limaduras de hierro alrededor de un dipolo que sigue al cursor (se tiñe con el color del tema)
+(()=>{
+const cv=document.getElementById('bg'),c=cv.getContext('2d'),rm=matchMedia('(prefers-reduced-motion: reduce)').matches;
+let w,h,mx,my,px,py,last=0,fil='20,26,38',acc='59,111,224',fr=0,t0=performance.now(),prev=0;
+const rgb=x=>{x=x.replace('#','');return [0,2,4].map(i=>parseInt(x.substr(i,2),16)).join(',')};
+window.lenzAcc=x=>{acc=rgb(x);if(rm)draw(performance.now())};
+function size(){const d=Math.min(devicePixelRatio||1,2);w=innerWidth;h=innerHeight;cv.width=w*d;cv.height=h*d;c.setTransform(d,0,0,d,0,0);if(px==null){mx=px=w*.7;my=py=h*.45}if(rm)draw(performance.now())}
+addEventListener('resize',size);
+addEventListener('pointermove',e=>{if(e.pointerType==='mouse'){mx=e.clientX;my=e.clientY;last=performance.now()}});
+function draw(t){
+  if(!(fr++%30))fil=getComputedStyle(document.documentElement).getPropertyValue('--fil').trim()||fil;
+  if(t-last>4000&&!rm){mx=w*.7+Math.cos(t*.0004)*w*.13;my=h*.45+Math.sin(t*.0006)*h*.2}
+  if(!rm){px+=(mx-px)*.07;py+=(my-py)*.07}
+  const a=rm?0:t*.00028,ca=Math.cos(-a),sa=Math.sin(-a),cb=Math.cos(a),sb=Math.sin(a),S=28,intro=rm?9:Math.min(1,(t-t0)/1500),R=intro*Math.hypot(w,h)*.8;
+  const P=[0,1,2,3].map(()=>new Path2D()),A=new Path2D();
+  for(let y=S/2;y<h;y+=S)for(let x=S/2;x<w;x+=S){
+    const dx=x-px,dy=y-py;if(Math.hypot(dx,dy)>R)continue;
+    const lx=dx*ca-dy*sa,ly=dx*sa+dy*ca,r=Math.max(Math.hypot(lx,ly),30),ux=lx/r,uy=ly/r;
+    const bx=3*ux*ux-1,by=3*ux*uy,X=bx*cb-by*sb,Y=bx*sb+by*cb,g=Math.atan2(Y,X);
+    const st=Math.min(1,Math.sqrt(1+3*ux*ux)*Math.pow(110/r,3)),L=(7+11*st)/2,ox=Math.cos(g)*L,oy=Math.sin(g)*L;
+    const k=st>.55?A:P[Math.min(3,Math.floor(st*6))];k.moveTo(x-ox,y-oy);k.lineTo(x+ox,y+oy)}
+  c.clearRect(0,0,w,h);c.lineWidth=1.4;c.lineCap='round';
+  [.16,.26,.38,.55].forEach((al,i)=>{c.strokeStyle='rgba('+fil+','+al+')';c.stroke(P[i])});
+  c.strokeStyle='rgba('+acc+',.85)';c.lineWidth=1.8;c.stroke(A);
+}
+function loop(t){if(t-prev>33){prev=t;draw(t)}requestAnimationFrame(loop)}
+size();if(rm)draw(performance.now());else requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
